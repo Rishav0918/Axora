@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login | Rishav Software</title>
+  <link rel="stylesheet" href="admin-login.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body>
+  <div class="admin-login-container">
+    <div class="admin-login-card" data-aos="zoom-in">
+      <div class="admin-logo">
+        <h1>🔐 RR Admin</h1>
+      </div>
+      
+      <h2>Admin Panel Login</h2>
+      <p class="login-subtitle">Enter your admin credentials to access the panel</p>
+
+      <form onsubmit="handleAdminLogin(event)">
+        <div class="form-group">
+          <label for="admin-email">Admin Email</label>
+          <input type="email" id="admin-email" name="email" required placeholder="Enter admin email">
+        </div>
+
+        <div class="form-group">
+          <label for="admin-password">Password</label>
+          <input type="password" id="admin-password" name="password" required placeholder="Enter password">
+        </div>
+
+        <button type="submit" class="btn-login">Login to Admin Panel</button>
+      </form>
+
+      <div class="admin-info">
+        <p>Default Admin Credentials:</p>
+        <p class="credentials">Email: <strong>admin@rishavsoft.com</strong></p>
+        <p class="credentials">Password: <strong>admin123</strong></p>
+      </div>
+
+      <p style="margin-top:20px;color:#fff;">Are you an executive? <a href="executive-login.html" style="color:#ff3333;">Executive Login</a></p>
+      <a href="index.html" class="btn-back">← Back to Home</a>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ once: true });
+
+    function handleAdminLogin(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById('admin-email').value;
+      const password = document.getElementById('admin-password').value;
+
+      // Simple admin authentication (in production, this should be backend validation)
+      const validAdmins = [
+        { email: 'admin@rishavsoft.com', password: 'admin123' }
+      ];
+
+      const isValidAdmin = validAdmins.some(admin => 
+        admin.email === email && admin.password === password
+      );
+
+      if (isValidAdmin) {
+        // Set admin session
+        sessionStorage.setItem('isAdmin', 'true');
+        sessionStorage.setItem('adminEmail', email);
+        
+        alert('Admin login successful!');
+        window.location.href = 'admin.html';
+      } else {
+        alert('Invalid admin credentials. Please try again.');
+        document.getElementById('admin-password').value = '';
+      }
+    }
+  </script>
+</body>
+</html>
+
+

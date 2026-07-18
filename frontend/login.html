@@ -1,0 +1,294 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | Rishav Software</title>
+
+  <link rel="stylesheet" href="login.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body>
+  <div class="login-container">
+    <div class="login-card" data-aos="zoom-in">
+      <!-- Login Form -->
+      <div id="login-form" class="form-container">
+        <h2>Welcome Back 👋</h2>
+        <p>Login to continue</p>
+        <form onsubmit="handleLogin(event)">
+          <input type="email" id="login-email" placeholder="Email" required />
+          <input type="password" id="login-password" placeholder="Password" required />
+          <button type="submit">Login</button>
+        </form>
+        <p class="toggle-text">
+          <a href="#" onclick="forgotPassword()">Forgot Password?</a><br>
+          Don't have an account? <a href="#" onclick="toggleForm(event)">Sign Up</a>
+        </p>
+        <p style="margin-top:20px;color:#000;">Are you an executive? <a href="executive-login.html" style="color:#007bff;">Executive Login</a></p>
+        <a href="index.html" class="back-home">← Back to Home</a>
+      </div>
+
+      <!-- Sign Up Form -->
+      <div id="signup-form" class="form-container" style="display:none;">
+        <h2>Create Account 🔐</h2>
+        <p>Join us today</p>
+        <form id="signup-form-fields" onsubmit="handleSignUp(event)">
+          <input type="text" id="signup-name" placeholder="Full Name" required />
+          <input type="email" id="signup-email" placeholder="Email" required />
+          <input type="tel" id="signup-phone" placeholder="Mobile Number" required pattern="\d{10,15}" />
+          <input type="password" id="signup-password" placeholder="Password" required />
+          <input type="password" id="signup-confirm" placeholder="Confirm Password" required />
+          <button type="submit">Create Account</button>
+        </form>
+        <p class="toggle-text">Already have an account? <a href="#" onclick="toggleForm(event)">Login</a></p>
+        <p style="margin-top:20px;color:#000;">Are you an executive? <a href="executive-login.html" style="color:#007bff;">Executive Login</a></p>
+        <a href="index.html" class="back-home">← Back to Home</a>
+      </div>
+
+      <!-- OTP Verification Form -->
+      <div id="verify-form" class="form-container" style="display:none;">
+        <h2>Verify Account 📱</h2>
+        <p>A verification code has been sent to your mobile number</p>
+        <form onsubmit="verifyOtp(event)">
+          <input type="text" id="signup-otp" placeholder="Enter 6-digit code" required pattern="\d{6}" maxlength="6" />
+          <button type="submit">Verify Account</button>
+          <button type="button" onclick="resendOtp()" class="secondary-btn">Resend Code</button>
+        </form>
+        <p class="toggle-text">Wrong number? <a href="#" onclick="backToSignup()">Change Details</a></p>
+        <p style="margin-top:20px;color:#000;">Are you an executive? <a href="executive-login.html" style="color:#007bff;">Executive Login</a></p>
+<a href="index.html" class="back-home">← Back to Home</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ once: true });
+
+    function toggleForm(event) {
+      event.preventDefault();
+      const loginForm = document.getElementById('login-form');
+      const signupForm = document.getElementById('signup-form');
+      
+      if (loginForm.style.display === 'none') {
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+      } else {
+        loginForm.style.display = 'none';
+        signupForm.style.display = 'block';
+      }
+    }
+
+    function forgotPassword() {
+      window.location.href = 'reset-password.html';
+    }
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      
+      try {
+        const response = await fetch('http://127.0.0.1:3000/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          // Store user login info and JWT token
+          sessionStorage.setItem('userEmail', email);
+          sessionStorage.setItem('userName', data.user.name);
+          sessionStorage.setItem('isLoggedIn', 'true');
+          sessionStorage.setItem('token', data.token);
+          sessionStorage.setItem('refreshToken', data.refreshToken);
+          
+          // Transfer guest cart to user cart if exists
+          const guestCartKey = 'cart-guest@example.com';
+          const userCartKey = `cart-${email}`;
+          const guestCart = localStorage.getItem(guestCartKey);
+          if (guestCart) {
+            const existingUserCart = localStorage.getItem(userCartKey);
+            let userCart = existingUserCart ? JSON.parse(existingUserCart) : [];
+            const guestItems = JSON.parse(guestCart);
+            // Merge carts (simple merge, could handle duplicates better)
+            userCart = userCart.concat(guestItems);
+            localStorage.setItem(userCartKey, JSON.stringify(userCart));
+            localStorage.removeItem(guestCartKey);
+          }
+          
+          alert('Login successful!');
+          window.location.href = 'dashboard.html';
+        } else {
+          alert(data.message || 'Login failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        alert('Login failed. Please try again later.');
+      }
+    }
+
+    function handleSignUp(event) {
+      event.preventDefault();
+      const name = document.getElementById('signup-name').value;
+      const email = document.getElementById('signup-email').value;
+      const phone = document.getElementById('signup-phone').value;
+      const password = document.getElementById('signup-password').value;
+      const confirm = document.getElementById('signup-confirm').value;
+      
+      if (password !== confirm) {
+        alert('Passwords do not match!');
+        return;
+      }
+      
+      if (!/^[\d]{10,15}$/.test(phone)) {
+        alert('Please enter a valid mobile number.');
+        return;
+      }
+      
+      // Get existing users
+      const users = JSON.parse(localStorage.getItem('users') || '{}');
+      
+      if (users[email]) {
+        alert('User already exists! Please login instead.');
+        toggleForm(event); // Switch to login form
+        return;
+      }
+      
+      // Store signup data temporarily
+      sessionStorage.setItem('pendingSignup', JSON.stringify({ name, email, phone, password }));
+      
+      // Send OTP
+      sendOtp(email);
+    }
+
+    async function sendOtp(email) {
+      try {
+        // Disable the Create Account button to prevent duplicate requests
+        const submitButton = document.querySelector('#signup-form-fields button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Sending OTP...';
+        
+        const response = await fetch('http://127.0.0.1:3000/send-email-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          // Show OTP verification form
+          document.getElementById('signup-form').style.display = 'none';
+          document.getElementById('verify-form').style.display = 'block';
+          
+          alert('Verification code sent to your email address!');
+        } else {
+          throw new Error(data.message || 'Unable to send verification code.');
+        }
+      } catch (error) {
+        console.error('Send OTP error:', error);
+        alert('Unable to send verification code. Please try again later.');
+      } finally {
+        // Re-enable button after 10 seconds
+        setTimeout(() => {
+          const submitButton = document.querySelector('#signup-form-fields button[type="submit"]');
+          submitButton.disabled = false;
+          submitButton.textContent = 'Create Account';
+        }, 10000);
+      }
+    }
+
+    async function verifyOtp(event) {
+      event.preventDefault();
+      const otp = document.getElementById('signup-otp').value.trim();
+      const pendingSignup = JSON.parse(sessionStorage.getItem('pendingSignup') || '{}');
+      
+      // Frontend validation
+      if (!otp) {
+        alert('Please enter the verification code');
+        return;
+      }
+      
+      if (!/^\d{6}$/.test(otp)) {
+        alert('OTP must be exactly 6 digits');
+        return;
+      }
+      
+      if (!pendingSignup.email) {
+        alert('Session expired. Please start again.');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Disable verify button to prevent duplicate requests
+      const verifyButton = document.querySelector('#verify-form button[type="submit"]');
+      verifyButton.disabled = true;
+      verifyButton.textContent = 'Verifying...';
+      
+      try {
+        const response = await fetch('http://127.0.0.1:3000/verify-email-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: pendingSignup.email, otp })
+        });
+
+        const data = await response.json();
+        console.log('Verification response:', data);
+        
+        if (data.success) {
+          // Clear pending data
+          sessionStorage.removeItem('pendingSignup');
+          
+          // Auto-login with user data
+          sessionStorage.setItem('userName', data.user.name);
+          sessionStorage.setItem('userEmail', data.user.email);
+          sessionStorage.setItem('isLoggedIn', 'true');
+          sessionStorage.setItem('token', data.token);
+          
+          alert('Account created and verified successfully! You are now logged in.');
+          window.location.href = 'dashboard.html';
+        } else {
+          // Show specific error message from backend
+          alert(data.message || 'Invalid OTP');
+        }
+      } catch (error) {
+        console.error('Verify OTP error:', error);
+        alert('Verification failed. Please check your internet connection and try again.');
+      } finally {
+        // Re-enable verify button
+        verifyButton.disabled = false;
+        verifyButton.textContent = 'Verify';
+      }
+    }
+
+    async function resendOtp() {
+      const pendingSignup = JSON.parse(sessionStorage.getItem('pendingSignup') || '{}');
+      if (pendingSignup.email) {
+        // Disable the Resend Code button to prevent duplicate requests
+        const resendButton = document.querySelector('#verify-form button.secondary-btn');
+        resendButton.disabled = true;
+        resendButton.textContent = 'Resending...';
+        
+        await sendOtp(pendingSignup.email);
+        
+        // Re-enable button after 10 seconds
+        setTimeout(() => {
+          resendButton.disabled = false;
+          resendButton.textContent = 'Resend Code';
+        }, 10000);
+      }
+    }
+
+    function backToSignup() {
+      document.getElementById('verify-form').style.display = 'none';
+      document.getElementById('signup-form').style.display = 'block';
+      document.getElementById('signup-otp').value = '';
+    }
+
+      </script>
+</body>
+</html>
+

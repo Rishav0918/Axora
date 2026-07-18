@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us | Axora Soft</title>
+  <link rel="stylesheet" href="about.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1 data-aos="fade-down" data-aos-duration="1500" class="logo">AS</h1>
+      <nav>
+        <a data-aos="fade-down" data-aos-duration="1500" href="index.html">HOME</a>
+        <a data-aos="fade-down" data-aos-duration="2000" href="about.html">ABOUT</a>
+        <a data-aos="fade-down" data-aos-duration="2500" href="products.html">PRICING</a>
+        <a data-aos="fade-down" data-aos-duration="3000" href="#contact">CONTACT US</a>
+      </nav>
+      <button data-aos="fade-down" data-aos-duration="1500" class="btn-signin" onclick="window.location.href='login.html'">SIGN IN</button>
+    </header>
+
+    <main>
+      <section class="about-section">
+        <h2 data-aos="fade-up" data-aos-duration="1500">About Axora Soft</h2>
+        <p data-aos="fade-up" data-aos-duration="2000" class="about-description">
+          At Axora Soft, we are passionate about transforming ideas into powerful digital experiences through innovative technology solutions, creative development, and reliable support services. We specialize in game development, website development, custom software solutions, mobile applications, UI/UX design, and digital services tailored for startups, businesses, creators, and entrepreneurs worldwide.
+        </p>
+
+        <div class="about-content">
+          <div class="about-item" data-aos="fade-right" data-aos-duration="1500">
+            <h3>Our Mission</h3>
+            <p>Our mission is to simplify the digital journey by delivering high-quality, ready-to-launch, and business-focused solutions that help clients save time, reduce development costs, and accelerate growth. From gaming platforms and business websites to advanced web applications and digital systems, we help transform ideas into successful products using modern technologies and creative strategies.</p>
+          </div>
+
+          <div class="about-item" data-aos="fade-left" data-aos-duration="1500">
+            <h3>Our Expertise</h3>
+            <p>Our expertise includes Unity game development, mobile game source codes, reskin services, modern website development, eCommerce solutions, payment gateway integration, authentication systems, web support, maintenance services, and scalable custom development projects. With a strong focus on performance, user experience, innovation, and reliability, we provide solutions that empower businesses and creators to grow confidently in the digital world.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="services-section">
+        <h2 data-aos="fade-up" data-aos-duration="1500">Why Choose Us</h2>
+        <div class="services-grid">
+          <div class="service-item" data-aos="zoom-in" data-aos-delay="200">
+            <h4>Custom Development</h4>
+            <p>Custom website and web application development tailored to your specific business needs and requirements.</p>
+          </div>
+          <div class="service-item" data-aos="zoom-in" data-aos-delay="400">
+            <h4>Game Development</h4>
+            <p>Unity game development and source codes, mobile game reskinning and publishing support for all platforms.</p>
+          </div>
+          <div class="service-item" data-aos="zoom-in" data-aos-delay="600">
+            <h4>Integration Solutions</h4>
+            <p>Payment gateway and authentication integration, mobile app and software solutions with seamless connectivity.</p>
+          </div>
+          <div class="service-item" data-aos="zoom-in" data-aos-delay="800">
+            <h4>Support & Maintenance</h4>
+            <p>Website maintenance and technical support, fast delivery with scalable architecture and modern UI/UX focused development.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Contact Section -->
+  <section class="contact-section" id="contact">
+    <div class="contact-container">
+      <h2 data-aos="fade-up" data-aos-duration="1500">Get In Touch</h2>
+      <p data-aos="fade-up" data-aos-duration="2000" class="contact-subtitle">We'd love to hear from you. Send us a message!</p>
+      
+      <div class="contact-content">
+        <!-- Contact Info -->
+        <div class="contact-info" style="background: black;" data-aos="fade-right" data-aos-duration="1500">
+          <h3>Contact Information</h3>
+          
+          <div class="info-item">
+            <div class="info-icon">📧</div>
+            <div class="info-details">
+              <h4>Email</h4>
+              <p><a href="mailto:info@axorasoft.com">info@axorasoft.com</a></p>
+              <p><a href="mailto:support@axorasoft.com">support@axorasoft.com</a></p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">📞</div>
+            <div class="info-details">
+              <h4>Phone</h4>
+              <p><a href="tel:+91-6299867638">+91-6299867638</a></p>
+              <p><a href="tel:+91-9211585089">+91-9211585089</a></p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">📍</div>
+            <div class="info-details">
+              <h4>Address</h4>
+              <p>Axora Soft<br>
+              Tech Park, 123 Innovation Drive<br>
+              Bangalore, Karnataka 560001<br>
+              India</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="contact-form" data-aos="fade-left" data-aos-duration="1500">
+          <form>
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" required></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ once: true });
+  </script>
+</body>
+</html>
+

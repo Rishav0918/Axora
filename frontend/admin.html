@@ -1,0 +1,1024 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel | Rishav Software</title>
+  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body>
+  <script>
+    // Check if admin is authenticated
+    const isAdmin = sessionStorage.getItem('isAdmin');
+    if (!isAdmin) {
+      window.location.href = 'admin-login.html';
+    }
+  </script>
+  <div class="admin-container">
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="logo-section">
+        <h1 class="logo">RR Admin</h1>
+      </div>
+      <div class="admin-actions">
+        <span class="admin-title">Admin Dashboard</span>
+        <button onclick="handleLogout()" class="btn-logout">Logout</button>
+        <button onclick="toggleSidebar()" class="mobile-menu-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <nav>
+        <a href="#" onclick="showSection('orders')" class="nav-link active">📋 All Orders</a>
+        <a href="#" onclick="showSection('enquiries')" class="nav-link">💬 Enquiries</a>
+        <a href="#" onclick="showSection('executives')" class="nav-link">🧑‍💼 Executives</a>
+        <a href="#" onclick="showSection('liveChat')" class="nav-link">💬 Live Chat Support</a>
+        <a href="#" onclick="showSection('analytics')" class="nav-link">📊 Analytics</a>
+        <a href="#" onclick="showSection('users')" class="nav-link">👥 Users</a>
+        <a href="index.html" class="nav-link">🏠 Back to Home</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Orders Section -->
+      <section id="orders" class="content-section active">
+        <h2>All Customer Orders</h2>
+        
+        <div class="orders-filter">
+          <input type="text" id="search-order" placeholder="Search by Order ID or User Email..." onkeyup="filterOrders()">
+          <select id="status-filter" onchange="filterOrders()">
+            <option value="">All Status</option>
+            <option value="Completed">Completed</option>
+            <option value="Pending">Pending</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+          </select>
+        </div>
+
+        <div class="orders-container">
+          <table class="orders-table" id="orders-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer Email</th>
+                <th>Date</th>
+                <th>Products</th>
+                <th>Quantity</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="orders-body">
+              <!-- Orders will be loaded here -->
+            </tbody>
+          </table>
+          <div id="no-orders" class="empty-message">
+            No orders found
+          </div>
+        </div>
+      </section>
+
+      <!-- Enquiries Section -->
+      <section id="enquiries" class="content-section">
+        <h2>Customer Enquiries</h2>
+        
+        <div class="enquiries-filter">
+          <input type="text" id="search-enquiry" placeholder="Search by name, email or subject..." onkeyup="filterEnquiries()">
+          <select id="subject-filter" onchange="filterEnquiries()">
+            <option value="">All Subjects</option>
+            <option value="General Inquiry">General Inquiry</option>
+            <option value="Product Support">Product Support</option>
+            <option value="Sales">Sales</option>
+            <option value="Partnership">Partnership</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="enquiries-container">
+          <table class="enquiries-table" id="enquiries-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Subject</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="enquiries-body">
+              <!-- Enquiries will be loaded here -->
+            </tbody>
+          </table>
+          <div id="no-enquiries" class="empty-message">
+            No enquiries found
+          </div>
+        </div>
+      </section>
+
+      <!-- Analytics Section -->
+      <section id="analytics" class="content-section">
+        <h2>Analytics & Reports</h2>
+        
+        <div class="analytics-grid">
+          <div class="analytics-card" data-aos="zoom-in">
+            <h3>Total Orders</h3>
+            <p class="analytics-number" id="total-orders-count">0</p>
+            <p class="analytics-label">All time orders</p>
+          </div>
+          <div class="analytics-card" data-aos="zoom-in" data-aos-delay="100">
+            <h3>Total Revenue</h3>
+            <p class="analytics-number" id="total-revenue">$0</p>
+            <p class="analytics-label">From all orders</p>
+          </div>
+          <div class="analytics-card" data-aos="zoom-in" data-aos-delay="200">
+            <h3>Active Users</h3>
+            <p class="analytics-number" id="active-users">0</p>
+            <p class="analytics-label">Unique customers</p>
+          </div>
+          <div class="analytics-card" data-aos="zoom-in" data-aos-delay="300">
+            <h3>Avg Order Value</h3>
+            <p class="analytics-number" id="avg-order-value">$0</p>
+            <p class="analytics-label">Average per order</p>
+          </div>
+        </div>
+
+        <div class="recent-orders">
+          <h3>Recent Orders</h3>
+          <table class="recent-table" id="recent-orders-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recent-orders-body">
+              <!-- Recent orders will be loaded here -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Users Section -->
+      <section id="users" class="content-section">
+        <h2>Registered Users</h2>
+        
+        <div class="users-container">
+          <table class="users-table" id="users-table">
+            <thead>
+              <tr>
+                <th>User Name</th>
+                <th>Email</th>
+                <th>Total Orders</th>
+                <th>Total Spent</th>
+                <th>Registration Date</th>
+              </tr>
+            </thead>
+            <tbody id="users-body">
+              <!-- Users will be loaded here -->
+            </tbody>
+          </table>
+          <div id="no-users" class="empty-message">
+            No users found
+          </div>
+        </div>
+      </section>
+
+      <!-- Executives Section -->
+      <section id="executives" class="content-section">
+        <h2>Executives</h2>
+
+        <div class="executive-form" style="margin-bottom:20px;">
+          <h3>Hire New Executive</h3>
+          <form onsubmit="addExecutive(event)">
+            <input type="text" id="exec-name" placeholder="Full Name" required />
+            <input type="text" id="exec-id" placeholder="Executive ID" required />
+            <input type="password" id="exec-password" placeholder="Password" required />
+            <button type="submit" class="btn-add">Add Executive</button>
+          </form>
+        </div>
+
+        <div class="executives-container">
+          <table class="users-table" id="executives-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>ID</th>
+                <th>Hire Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="executives-body">
+              <!-- Executives will be loaded here -->
+            </tbody>
+          </table>
+          <div id="no-execs" class="empty-message">
+            No executives found
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Chat Support Section -->
+      <section id="liveChat" class="content-section">
+        <h2>Live Chat Support</h2>
+        
+        <div class="live-chat-admin-container">
+          <div class="live-chat-list">
+            <h3>Active Chats</h3>
+            <div id="chat-alerts" class="chat-alerts">
+              <!-- Alerts will appear here -->
+            </div>
+            <button onclick="clearChatAlerts()" class="btn-clear-alerts" style="margin-bottom:10px;">Clear Alerts</button>
+            <div class="chat-list" id="chat-list">
+              <!-- Chat sessions will be loaded here -->
+            </div>
+            <div id="no-chats" class="empty-message">
+              No active chats
+            </div>
+          </div>
+
+          <div class="live-chat-display">
+            <div class="chat-conversation" id="chat-conversation">
+              <div class="no-chat-selected">
+                Select a chat to view conversation
+              </div>
+            </div>
+            <div class="chat-actions">
+              <button onclick="offerEndChat()" class="btn-offer-end">Offer to End Chat</button>
+              <button onclick="clearChatHistory()" class="btn-clear-chat">Clear Chat</button>
+            </div>
+            <div class="chat-response-area" id="chat-response-area" style="display: none;">
+              <textarea id="admin-response" placeholder="Type your response..." rows="3"></textarea>
+              <button onclick="sendAdminResponse()" class="btn-send-response">Send Response</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Order Detail Modal -->
+  <div id="order-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeOrderModal()">&times;</span>
+      <h2>Order Details</h2>
+      <div class="order-details">
+        <p><strong>Order ID:</strong> <span id="detail-order-id"></span></p>
+        <p><strong>Customer Email:</strong> <span id="detail-email"></span></p>
+        <p><strong>Order Date:</strong> <span id="detail-date"></span></p>
+        <p><strong>Products:</strong> <span id="detail-products"></span></p>
+        <p><strong>Total Amount:</strong> <span id="detail-amount"></span></p>
+        <p><strong>Current Status:</strong> 
+          <select id="detail-status" class="status-select">
+            <option value="Completed">Completed</option>
+            <option value="Pending">Pending</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+          </select>
+        </p>
+        <button onclick="updateOrderStatus()" class="btn-update">Update Status</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enquiry Detail Modal -->
+  <div id="enquiry-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeEnquiryModal()">&times;</span>
+      <h2>Enquiry Details</h2>
+      <div class="enquiry-details">
+        <p><strong>Enquiry ID:</strong> <span id="detail-enquiry-id"></span></p>
+        <p><strong>Name:</strong> <span id="detail-enquiry-name"></span></p>
+        <p><strong>Email:</strong> <span id="detail-enquiry-email"></span></p>
+        <p><strong>Phone:</strong> <span id="detail-enquiry-phone"></span></p>
+        <p><strong>Subject:</strong> <span id="detail-enquiry-subject"></span></p>
+        <p><strong>Date & Time:</strong> <span id="detail-enquiry-datetime"></span></p>
+        <p><strong>Message:</strong></p>
+        <div class="message-box">
+          <p id="detail-enquiry-message"></p>
+        </div>
+        <button onclick="closeEnquiryModal()" class="btn-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ once: true });
+
+    let allOrders = [];
+    let allUsers = {};
+    let allExecutives = {};
+    let allEnquiries = [];
+    let allLiveChats = [];
+    let currentOrderId = null;
+    let currentEnquiryId = null;
+    let currentChatId = null;
+
+    // Initialize
+    window.addEventListener('load', function() {
+      loadAllOrders();
+      loadAllUsers();
+      loadAllExecutives();
+      loadAllEnquiries();
+      loadAllLiveChats();
+      updateAnalytics();
+      displayOrders();
+      displayUsers();
+      displayExecutives();
+      displayEnquiries();
+      // periodically refresh chats/executives so page stays up-to-date
+      setInterval(() => {
+        loadAllLiveChats();
+        displayLiveChats();
+        loadChatAlerts();
+      }, 5000);
+    });
+
+    // ========== LIVE CHAT FUNCTIONS ==========
+    function loadAllLiveChats() {
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      
+      // Group chats by email to create sessions
+      const chatSessions = {};
+      allChats.forEach(chat => {
+        if (!chatSessions[chat.email]) {
+          chatSessions[chat.email] = {
+            email: chat.email,
+            messages: [],
+            lastMessage: chat.time,
+            status: chat.status || 'pending',
+            assignedExec: chat.assignedExec || null
+          };
+        }
+        chatSessions[chat.email].messages.push(chat);
+        // keep last status/assigned info up to date
+        chatSessions[chat.email].status = chat.status || chatSessions[chat.email].status;
+        if (chat.assignedExec) chatSessions[chat.email].assignedExec = chat.assignedExec;
+      });
+
+      // free executives for any closed sessions
+      Object.values(chatSessions).forEach(s => {
+        if (s.status === 'closed' && s.assignedExec) freeExecutive(s.email);
+      });
+
+      // reload executives in case freeExecutive changed any statuses
+      loadAllExecutives();
+
+      allLiveChats = Object.values(chatSessions);
+    }
+
+    function displayLiveChats() {
+      const chatList = document.getElementById('chat-list');
+      const noChats = document.getElementById('no-chats');
+      // hide sessions that are not yet assigned to any executive
+      const visibleChats = allLiveChats.filter(c => c.assignedExec);
+
+      if (visibleChats.length === 0) {
+        chatList.innerHTML = '';
+        noChats.style.display = 'block';
+        return;
+      }
+
+      noChats.style.display = 'none';
+      chatList.innerHTML = visibleChats.map(chat => `
+        <div class="chat-session" onclick="openChatSession('${chat.email}')">
+          <div class="chat-session-header">
+            <p class="chat-email">${chat.email}</p>
+            <span class="chat-status ${chat.status}">${chat.status}</span>
+          </div>
+          ${chat.assignedExec ? `<p class="chat-assigned">Assigned: ${chat.assignedExec}</p>` : ''}
+          <p class="chat-preview">${chat.messages[chat.messages.length - 1]?.message.substring(0, 40)}...</p>
+          <p class="chat-time">${chat.lastMessage}</p>
+        </div>
+      `).join('');
+      displayExecutives();
+    }
+
+    function openChatSession(email) {
+      currentChatId = email;
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const emailChats = allChats.filter(chat => chat.email === email).sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
+
+      if (emailChats.length === 0) {
+        document.getElementById('chat-conversation').innerHTML = '<div class="no-chat-selected">No chat history found for this email</div>';
+        return;
+      }
+
+      const conversation = document.getElementById('chat-conversation');
+      const responseArea = document.getElementById('chat-response-area');
+      const offerBtn = document.querySelector('.btn-offer-end');
+      const lastMessage = emailChats[emailChats.length - 1];
+
+      const assigned = lastMessage.assignedExec || emailChats.find(c=>c.assignedExec)?.assignedExec;
+      conversation.innerHTML = `
+        <div class="chat-header">
+          <h3>${email}</h3>
+          ${assigned ? `<p class="chat-assigned">Assigned: ${assigned}</p>` : ''}
+          <p class="chat-status-badge ${lastMessage.status || 'pending'}">${lastMessage.status || 'pending'}</p>
+        </div>
+        <div class="messages-container" id="messages-container">
+          ${emailChats.map(msg => `
+            <div class="message ${msg.sender} ${msg.offerEnd ? 'offer-end' : ''} ${msg.offerEndResponse ? 'offer-response' : ''}">
+              <p class="msg-content">${msg.message}</p>
+              <p class="msg-time">${msg.date} - ${msg.time}</p>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      // enable/disable offer-end button
+      if (offerBtn) {
+        // determine if latest support offer still awaits a user reply or subsequent message
+        let hasPending = false;
+        // find the index of the most recent offer
+        const lastOfferIdx = emailChats.map((c,i) => c.offerEnd ? i : -1).filter(i => i >= 0).pop();
+        if (lastOfferIdx !== undefined && lastOfferIdx >= 0) {
+          // look at messages after that offer
+          const after = emailChats.slice(lastOfferIdx + 1);
+          // if no user message followed, keep pending
+          hasPending = !after.some(c => c.sender === 'user');
+        }
+        offerBtn.disabled = hasPending || lastMessage.status === 'closed';
+        offerBtn.style.opacity = offerBtn.disabled ? '0.5' : '1';
+      }
+
+      responseArea.style.display = 'flex';
+
+      // Scroll to bottom
+      setTimeout(() => {
+        const container = document.getElementById('messages-container');
+        if (container) container.scrollTop = container.scrollHeight;
+      }, 100);
+      // update executive status display as well
+      displayExecutives();
+    }
+
+    function sendAdminResponse() {
+      const response = document.getElementById('admin-response').value.trim();
+
+      if (!response) {
+        alert('Please type a response');
+        return;
+      }
+
+      if (!currentChatId) {
+        alert('No chat selected');
+        return;
+      }
+
+      // Get all chats
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+
+      // Add admin response
+      const adminMessage = {
+        id: 'CHAT-' + Date.now(),
+        email: currentChatId,
+        message: response,
+        sender: 'admin',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        status: 'responded'
+      };
+
+      allChats.push(adminMessage);
+      localStorage.setItem('liveChats', JSON.stringify(allChats));
+
+      // Clear input
+      document.getElementById('admin-response').value = '';
+
+      // Reload and refresh display
+      loadAllLiveChats();
+      displayLiveChats();
+      openChatSession(currentChatId);
+      
+      alert('Response sent successfully!');
+    }
+
+    function offerEndChat() {
+      if (!currentChatId) {
+        alert('No chat selected');
+        return;
+      }
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const offerMessage = {
+        id: 'CHAT-' + Date.now(),
+        email: currentChatId,
+        message: 'Admin is offering to end the chat. Please choose "End Chat" when you are satisfied or "Need More Help" to continue.',
+        sender: 'admin',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        offerEnd: true,
+        status: 'pending-end'
+      };
+      allChats.push(offerMessage);
+      localStorage.setItem('liveChats', JSON.stringify(allChats));
+      loadAllLiveChats();
+      displayLiveChats();
+      openChatSession(currentChatId);
+      alert('Offer to end chat sent to user.');
+    }
+
+    function clearChatHistory() {
+      if (!currentChatId) {
+        alert('Select a chat session first');
+        return;
+      }
+      if (!confirm('Are you sure you want to clear the chat history for this user?')) return;
+      // free assigned executive
+      freeExecutive(currentChatId);
+      let allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      allChats = allChats.filter(chat => chat.email !== currentChatId);
+      localStorage.setItem('liveChats', JSON.stringify(allChats));
+      loadAllLiveChats();
+      displayLiveChats();
+      document.getElementById('chat-conversation').innerHTML = '<div class="no-chat-selected">Select a chat to view conversation</div>';
+      document.getElementById('chat-response-area').style.display = 'none';
+      alert('Chat history cleared.');
+    }
+
+    // ========== EXISTING FUNCTIONS ==========
+
+    function loadAllOrders() {
+      // Get all users from localStorage
+      const users = JSON.parse(localStorage.getItem('all-users') || '{}');
+      allOrders = [];
+
+      // Collect orders from all users
+      Object.values(users).forEach(user => {
+        if (user.orders) {
+          user.orders.forEach(order => {
+            allOrders.push({
+              ...order,
+              userEmail: user.email,
+              userName: user.name
+            });
+          });
+        }
+      });
+
+      // Sort by date (newest first)
+      allOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    function loadAllUsers() {
+      allUsers = JSON.parse(localStorage.getItem('all-users') || '{}');
+    }
+
+    function displayOrders() {
+      const tbody = document.getElementById('orders-body');
+      const noOrders = document.getElementById('no-orders');
+
+      if (allOrders.length === 0) {
+        tbody.innerHTML = '';
+        noOrders.style.display = 'block';
+        return;
+      }
+
+      noOrders.style.display = 'none';
+      tbody.innerHTML = allOrders.map(order => `
+        <tr>
+          <td><strong>${order.id}</strong></td>
+          <td>${order.userEmail || 'N/A'}</td>
+          <td>${order.date}</td>
+          <td>${order.products}</td>
+          <td>${order.quantity || '-'}</td>
+          <td>$${order.amount.toFixed(2)}</td>
+          <td><span class="status ${order.status.toLowerCase()}">${order.status}</span></td>
+          <td><button onclick="openOrderModal('${order.id}')" class="btn-detail">View</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function displayUsers() {
+      const tbody = document.getElementById('users-body');
+      const noUsers = document.getElementById('no-users');
+
+      const users = Object.values(allUsers);
+      if (users.length === 0) {
+        tbody.innerHTML = '';
+        noUsers.style.display = 'block';
+        return;
+      }
+
+      noUsers.style.display = 'none';
+      tbody.innerHTML = users.map(user => {
+        const userOrders = user.orders || [];
+        const totalSpent = userOrders.reduce((sum, order) => sum + order.amount, 0);
+        const registrationDate = user.registrationDate || 'N/A';
+
+        return `
+          <tr>
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td>${userOrders.length}</td>
+            <td>$${totalSpent.toFixed(2)}</td>
+            <td>${registrationDate}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateAnalytics() {
+      const totalOrdersCount = allOrders.length;
+      const totalRevenue = allOrders.reduce((sum, order) => sum + order.amount, 0);
+      const activeUsers = Object.keys(allUsers).length;
+      const avgOrderValue = totalOrdersCount > 0 ? totalRevenue / totalOrdersCount : 0;
+
+      document.getElementById('total-orders-count').textContent = totalOrdersCount;
+      document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
+      document.getElementById('active-users').textContent = activeUsers;
+      document.getElementById('avg-order-value').textContent = `$${avgOrderValue.toFixed(2)}`;
+
+      // Display recent orders
+      const recentOrders = allOrders.slice(0, 5);
+      const recentTable = document.getElementById('recent-orders-body');
+      recentTable.innerHTML = recentOrders.map(order => `
+        <tr>
+          <td>${order.id}</td>
+          <td>${order.userEmail || 'N/A'}</td>
+          <td>$${order.amount.toFixed(2)}</td>
+          <td>${order.date}</td>
+          <td><span class="status ${order.status.toLowerCase()}">${order.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function openOrderModal(orderId) {
+      const order = allOrders.find(o => o.id === orderId);
+      if (!order) return;
+
+      currentOrderId = orderId;
+      document.getElementById('detail-order-id').textContent = order.id;
+      document.getElementById('detail-email').textContent = order.userEmail || 'N/A';
+      document.getElementById('detail-date').textContent = order.date;
+      document.getElementById('detail-products').textContent = order.products;
+      document.getElementById('detail-amount').textContent = `$${order.amount.toFixed(2)}`;
+      document.getElementById('detail-status').value = order.status;
+
+      document.getElementById('order-modal').style.display = 'block';
+    }
+
+    function closeOrderModal() {
+      document.getElementById('order-modal').style.display = 'none';
+      currentOrderId = null;
+    }
+
+    function updateOrderStatus() {
+      if (!currentOrderId) return;
+
+      const newStatus = document.getElementById('detail-status').value;
+      const order = allOrders.find(o => o.id === currentOrderId);
+      
+      if (order) {
+        order.status = newStatus;
+
+        // Update in localStorage
+        const users = JSON.parse(localStorage.getItem('all-users') || '{}');
+        Object.values(users).forEach(user => {
+          if (user.orders) {
+            user.orders.forEach(userOrder => {
+              if (userOrder.id === currentOrderId) {
+                userOrder.status = newStatus;
+              }
+            });
+          }
+        });
+        localStorage.setItem('all-users', JSON.stringify(users));
+
+        alert('Order status updated successfully!');
+        displayOrders();
+        closeOrderModal();
+      }
+    }
+
+    function filterOrders() {
+      const searchTerm = document.getElementById('search-order').value.toLowerCase();
+      const statusFilter = document.getElementById('status-filter').value;
+
+      const tbody = document.getElementById('orders-body');
+      const filtered = allOrders.filter(order => {
+        const matchesSearch = order.id.toLowerCase().includes(searchTerm) || 
+                             (order.userEmail && order.userEmail.toLowerCase().includes(searchTerm));
+        const matchesStatus = !statusFilter || order.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        document.getElementById('no-orders').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('no-orders').style.display = 'none';
+      tbody.innerHTML = filtered.map(order => `
+        <tr>
+          <td><strong>${order.id}</strong></td>
+          <td>${order.userEmail || 'N/A'}</td>
+          <td>${order.date}</td>
+          <td>${order.products}</td>
+          <td>${order.quantity || '-'}</td>
+          <td>$${order.amount.toFixed(2)}</td>
+          <td><span class="status ${order.status.toLowerCase()}">${order.status}</span></td>
+          <td><button onclick="openOrderModal('${order.id}')" class="btn-detail">View</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function showSection(sectionId) {
+      // Hide all sections
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+      });
+
+      // Remove active from all nav links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+
+      // Show selected section
+      document.getElementById(sectionId).classList.add('active');
+
+      // Add active to clicked nav link
+      event.target.classList.add('active');
+
+      // Reload data based on selected section
+      if (sectionId === 'analytics') {
+        updateAnalytics();
+      } else if (sectionId === 'liveChat') {
+        loadChatAlerts();
+        loadAllLiveChats();
+        displayLiveChats();
+      } else if (sectionId === 'executives') {
+        loadAllExecutives();
+        displayExecutives();
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('isAdmin');
+      sessionStorage.removeItem('adminEmail');
+      alert('Logged out from admin panel');
+      window.location.href = 'BM.html';
+    }
+
+    // Executive management functions
+    function loadAllExecutives() {
+      allExecutives = JSON.parse(localStorage.getItem('executives') || '{}');
+    }
+
+    // ensure an executive becomes available when their chat ends and
+    // optionally assign them the next pending session
+    function freeExecutive(email) {
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const chat = allChats.find(c => c.email === email && c.assignedExec);
+      let freedExecId = null;
+      if (chat) {
+        const execId = chat.assignedExec;
+        freedExecId = execId;
+        const execs = JSON.parse(localStorage.getItem('executives') || '{}');
+        if (execs[execId]) {
+          execs[execId].busy = false;
+          localStorage.setItem('executives', JSON.stringify(execs));
+        }
+      }
+      if (freedExecId) {
+        const execs = JSON.parse(localStorage.getItem('executives') || '{}');
+        if (execs[freedExecId] && !execs[freedExecId].busy) {
+          const pending = allChats.find(c => !c.assignedExec && c.status !== 'closed');
+          if (pending) {
+            // summary the last user message so exec knows concern
+            const userMsgs = allChats.filter(c => c.email === pending.email && c.sender === 'user');
+            const lastUser = userMsgs.length ? userMsgs[userMsgs.length-1].message : '';
+            allChats.push({
+              id: 'CHAT-' + Date.now(),
+              email: pending.email,
+              message: 'AIBOT NOTE: user concern - ' + lastUser,
+              sender: 'bot',
+              date: new Date().toLocaleDateString(),
+              time: new Date().toLocaleTimeString(),
+              status: 'info'
+            });
+            pending.assignedExec = freedExecId;
+            execs[freedExecId].busy = true;
+            localStorage.setItem('liveChats', JSON.stringify(allChats));
+            localStorage.setItem('executives', JSON.stringify(execs));
+            addChatAlert('Executive ' + freedExecId + ' has been assigned chat from AI: ' + pending.email);
+          }
+        }
+      }
+      loadAllExecutives();
+      displayExecutives();
+    }
+
+    function loadChatAlerts() {
+      const alerts = JSON.parse(localStorage.getItem('chatAlerts') || '[]');
+      const container = document.getElementById('chat-alerts');
+      if (!container) return;
+      if (alerts.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+      container.innerHTML = alerts.map(a => `
+        <div class="alert-item">
+          <span class="alert-time">[${a.time}]</span> ${a.message}
+        </div>
+      `).join('');
+    }
+    function addChatAlert(alertMsg) {
+      const alerts = JSON.parse(localStorage.getItem('chatAlerts') || '[]');
+      alerts.push({ message: alertMsg, time: new Date().toLocaleTimeString() });
+      localStorage.setItem('chatAlerts', JSON.stringify(alerts));
+      loadChatAlerts();
+    }
+    function clearChatAlerts() {
+      localStorage.removeItem('chatAlerts');
+      loadChatAlerts();
+      alert('Chat alerts cleared');
+    }
+
+    function displayExecutives() {
+      const tbody = document.getElementById('executives-body');
+      const noExec = document.getElementById('no-execs');
+      const execs = Object.values(allExecutives);
+      if (execs.length === 0) {
+        tbody.innerHTML = '';
+        noExec.style.display = 'block';
+        return;
+      }
+      noExec.style.display = 'none';
+      tbody.innerHTML = execs.map(exec => `
+        <tr>
+          <td>${exec.name || ''}</td>
+          <td>${exec.id}</td>
+          <td>${exec.hireDate || ''}</td>
+          <td>${exec.busy ? '<span class="status busy">Busy</span>' : '<span class="status free">Free</span>'}</td>
+          <td><button onclick="removeExecutive('${exec.id}')" class="btn-delete">Remove</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function addExecutive(event) {
+      event.preventDefault();
+      const name = document.getElementById('exec-name').value;
+      const id = document.getElementById('exec-id').value;
+      const password = document.getElementById('exec-password').value;
+      if (allExecutives[id]) {
+        alert('Executive ID already exists!');
+        return;
+      }
+      const hireDate = new Date().toLocaleDateString();
+      allExecutives[id] = { id, name, password, hireDate, busy: false };
+      localStorage.setItem('executives', JSON.stringify(allExecutives));
+      displayExecutives();
+      event.target.reset();
+    }
+
+    function removeExecutive(id) {
+      if (confirm('Remove this executive?')) {
+        delete allExecutives[id];
+        localStorage.setItem('executives', JSON.stringify(allExecutives));
+        displayExecutives();
+      }
+    }
+
+    // Enquiry Functions
+    function loadAllEnquiries() {
+      const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+      allEnquiries = contacts.sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    function displayEnquiries() {
+      const tbody = document.getElementById('enquiries-body');
+      const noEnquiries = document.getElementById('no-enquiries');
+
+      if (allEnquiries.length === 0) {
+        tbody.innerHTML = '';
+        noEnquiries.style.display = 'block';
+        return;
+      }
+
+      noEnquiries.style.display = 'none';
+      tbody.innerHTML = allEnquiries.map(enquiry => `
+        <tr>
+          <td><strong>${enquiry.id}</strong></td>
+          <td>${enquiry.name}</td>
+          <td>${enquiry.email}</td>
+          <td>${enquiry.phone || 'N/A'}</td>
+          <td><span class="subject-badge">${enquiry.subject}</span></td>
+          <td>${enquiry.date}</td>
+          <td>${enquiry.time || 'N/A'}</td>
+          <td><button onclick="openEnquiryModal('${enquiry.id}')" class="btn-detail">View</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function openEnquiryModal(enquiryId) {
+      const enquiry = allEnquiries.find(e => e.id === enquiryId);
+      if (!enquiry) return;
+
+      currentEnquiryId = enquiryId;
+      document.getElementById('detail-enquiry-id').textContent = enquiry.id;
+      document.getElementById('detail-enquiry-name').textContent = enquiry.name;
+      document.getElementById('detail-enquiry-email').textContent = enquiry.email;
+      document.getElementById('detail-enquiry-phone').textContent = enquiry.phone || 'N/A';
+      document.getElementById('detail-enquiry-subject').textContent = enquiry.subject;
+      document.getElementById('detail-enquiry-datetime').textContent = `${enquiry.date} ${enquiry.time || ''}`;
+      document.getElementById('detail-enquiry-message').textContent = enquiry.message;
+
+      document.getElementById('enquiry-modal').style.display = 'block';
+    }
+
+    function closeEnquiryModal() {
+      document.getElementById('enquiry-modal').style.display = 'none';
+      currentEnquiryId = null;
+    }
+
+    function filterEnquiries() {
+      const searchTerm = document.getElementById('search-enquiry').value.toLowerCase();
+      const subjectFilter = document.getElementById('subject-filter').value;
+
+      const tbody = document.getElementById('enquiries-body');
+      const filtered = allEnquiries.filter(enquiry => {
+        const matchesSearch = enquiry.name.toLowerCase().includes(searchTerm) || 
+                             enquiry.email.toLowerCase().includes(searchTerm) ||
+                             enquiry.subject.toLowerCase().includes(searchTerm);
+        const matchesSubject = !subjectFilter || enquiry.subject === subjectFilter;
+        return matchesSearch && matchesSubject;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        document.getElementById('no-enquiries').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('no-enquiries').style.display = 'none';
+      tbody.innerHTML = filtered.map(enquiry => `
+        <tr>
+          <td><strong>${enquiry.id}</strong></td>
+          <td>${enquiry.name}</td>
+          <td>${enquiry.email}</td>
+          <td>${enquiry.phone || 'N/A'}</td>
+          <td><span class="subject-badge">${enquiry.subject}</span></td>
+          <td>${enquiry.date}</td>
+          <td>${enquiry.time || 'N/A'}</td>
+          <td><button onclick="openEnquiryModal('${enquiry.id}')" class="btn-detail">View</button></td>
+        </tr>
+      `).join('');
+    }
+
+    window.onclick = function(event) {
+      const orderModal = document.getElementById('order-modal');
+      const enquiryModal = document.getElementById('enquiry-modal');
+      if (event.target == orderModal) {
+        closeOrderModal();
+      }
+      if (event.target == enquiryModal) {
+        closeEnquiryModal();
+      }
+    }
+
+    // Toggle Sidebar for Mobile
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('active');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+      const sidebar = document.querySelector('.sidebar');
+      const menuToggle = document.querySelector('.mobile-menu-toggle');
+      
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(event.target) && 
+          !menuToggle.contains(event.target) &&
+          sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      const sidebar = document.querySelector('.sidebar');
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

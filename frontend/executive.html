@@ -1,0 +1,308 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Executive Panel | Rishav Software</title>
+  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+<body>
+  <div class="admin-header">
+    <div class="logo-section">
+      <span class="logo">RR Executive</span>
+    </div>
+    <div class="admin-actions">
+      <span id="exec-welcome"></span>
+      <button class="btn-logout" onclick="handleLogout()">Logout</button>
+    </div>
+  </div>
+
+  <main class="main-content" style="margin-left:0; padding-top:80px;">
+    <h2>Live Chat Support</h2>
+    <div class="live-chat-admin-container">
+      <div class="live-chat-list">
+        <h3>Active Chats</h3>
+        <div class="chat-list" id="chat-list"></div>
+        <div id="no-chats" class="empty-message">No active chats</div>
+      </div>
+      <div class="live-chat-display">
+        <div class="chat-conversation" id="chat-conversation">
+          <div class="no-chat-selected">Select a chat to view conversation</div>
+        </div>
+        <div class="chat-actions">
+          <button onclick="offerEndChat()" class="btn-offer-end">Offer to End Chat</button>
+          <button onclick="clearChatHistory()" class="btn-clear-chat">Clear Chat</button>
+        </div>
+        <div class="chat-response-area" id="chat-response-area" style="display: none;">
+          <textarea id="admin-response" placeholder="Type your response..." rows="3"></textarea>
+          <button onclick="sendAdminResponse()" class="btn-send-response">Send Response</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ once: true });
+
+    // guard
+    window.addEventListener('load', function() {
+      if (sessionStorage.getItem('isExecutive') !== 'true') {
+        window.location.href = 'executive-login.html';
+        return;
+      }
+      const id = sessionStorage.getItem('executiveId');
+      document.getElementById('exec-welcome').innerText = `Executive: ${id}`;
+      loadAllLiveChats();
+      displayLiveChats();
+      // refresh chat list every few seconds so that new assignments arrive
+      setInterval(() => {
+        loadAllLiveChats();
+        displayLiveChats();
+      }, 5000);
+    });
+
+    function handleLogout() {
+      sessionStorage.removeItem('isExecutive');
+      sessionStorage.removeItem('executiveId');
+      alert('Logged out from executive panel');
+      window.location.href = 'BM.html';
+    }
+
+    let allLiveChats = [];
+    let currentChatId = null;
+
+    // ========== LIVE CHAT FUNCTIONS ==========
+    function loadAllLiveChats() {
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const chatSessions = {};
+      allChats.forEach(chat => {
+        if (!chatSessions[chat.email]) {
+          chatSessions[chat.email] = {
+            email: chat.email,
+            messages: [],
+            lastMessage: chat.time,
+            status: chat.status || 'pending',
+            assignedExec: chat.assignedExec || null
+          };
+        }
+        chatSessions[chat.email].messages.push(chat);
+        chatSessions[chat.email].status = chat.status || chatSessions[chat.email].status;
+        if (chat.assignedExec) chatSessions[chat.email].assignedExec = chat.assignedExec;
+      });
+
+      // free execs for closed
+      Object.values(chatSessions).forEach(s => {
+        if (s.status === 'closed' && s.assignedExec) freeExecutive(s.email);
+      });
+
+      allLiveChats = Object.values(chatSessions);
+    }
+
+    // mark an executive free and try to pick up any pending chat
+    function addChatAlert(alertMsg) {
+      const alerts = JSON.parse(localStorage.getItem('chatAlerts') || '[]');
+      alerts.push({ message: alertMsg, time: new Date().toLocaleTimeString() });
+      localStorage.setItem('chatAlerts', JSON.stringify(alerts));
+      // if alerts panel exists update it
+      const container = document.getElementById('chat-alerts');
+      if (container) loadChatAlerts();
+    }
+    function freeExecutive(email) {
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const chat = allChats.find(c => c.email === email && c.assignedExec);
+      let freedExecId = null;
+      if (chat) {
+        const execId = chat.assignedExec;
+        freedExecId = execId;
+        const execs = JSON.parse(localStorage.getItem('executives') || '{}');
+        if (execs[execId]) {
+          execs[execId].busy = false;
+          localStorage.setItem('executives', JSON.stringify(execs));
+        }
+      }
+      if (freedExecId) {
+        const execs = JSON.parse(localStorage.getItem('executives') || '{}');
+        if (execs[freedExecId] && !execs[freedExecId].busy) {
+          const pending = allChats.find(c => !c.assignedExec && c.status !== 'closed');
+          if (pending) {
+            // record AI summary for executive
+            const userMsgs = allChats.filter(c => c.email === pending.email && c.sender === 'user');
+            const lastUser = userMsgs.length ? userMsgs[userMsgs.length-1].message : '';
+            allChats.push({
+              id: 'CHAT-' + Date.now(),
+              email: pending.email,
+              message: 'AIBOT NOTE: user concern - ' + lastUser,
+              sender: 'bot',
+              date: new Date().toLocaleDateString(),
+              time: new Date().toLocaleTimeString(),
+              status: 'info'
+            });
+            pending.assignedExec = freedExecId;
+            execs[freedExecId].busy = true;
+            localStorage.setItem('liveChats', JSON.stringify(allChats));
+            localStorage.setItem('executives', JSON.stringify(execs));
+            addChatAlert('Executive ' + freedExecId + ' has been assigned chat from AI: ' + pending.email);
+          }
+        }
+      }
+      // note: callers (like clearChatHistory) will refresh the list as needed
+      // if this function is triggered during loadAllLiveChats we avoid recursion
+      // so we don't call the loaders here.
+    }
+
+    function displayLiveChats() {
+      const chatList = document.getElementById('chat-list');
+      const noChats = document.getElementById('no-chats');
+
+      // show only those sessions assigned to this executive
+      const filtered = allLiveChats.filter(c => c.assignedExec === sessionStorage.getItem('executiveId'));
+      if (filtered.length === 0) {
+        chatList.innerHTML = '';
+        noChats.style.display = 'block';
+        return;
+      }
+
+      noChats.style.display = 'none';
+      chatList.innerHTML = filtered.map(chat => `
+        <div class="chat-session" onclick="openChatSession('${chat.email}')">
+          <div class="chat-session-header">
+            <p class="chat-email">${chat.email}</p>
+            <span class="chat-status ${chat.status}">${chat.status}</span>
+          </div>
+          <p class="chat-preview">${chat.messages[chat.messages.length - 1]?.message.substring(0, 40)}...</p>
+          <p class="chat-time">${chat.lastMessage}</p>
+        </div>
+      `).join('');
+    }
+
+    function openChatSession(email) {
+      currentChatId = email;
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const emailChats = allChats.filter(chat => chat.email === email).sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
+
+      if (emailChats.length === 0) {
+        document.getElementById('chat-conversation').innerHTML = '<div class="no-chat-selected">No chat history found for this email</div>';
+        return;
+      }
+
+      const conversation = document.getElementById('chat-conversation');
+      const responseArea = document.getElementById('chat-response-area');
+      const offerBtn = document.querySelector('.btn-offer-end');
+      const lastMessage = emailChats[emailChats.length - 1];
+
+      conversation.innerHTML = `
+        <div class="chat-header">
+          <h3>${email}</h3>
+          <p class="chat-status-badge ${lastMessage.status || 'pending'}">${lastMessage.status || 'pending'}</p>
+        </div>
+        <div class="messages-container" id="messages-container">
+          ${emailChats.map(msg => `
+            <div class="message ${msg.sender} ${msg.offerEnd ? 'offer-end' : ''} ${msg.offerEndResponse ? 'offer-response' : ''}">
+              <p class="msg-content">${msg.message}</p>
+              <p class="msg-time">${msg.date} - ${msg.time}</p>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      // enable/disable offer-end button
+      if (offerBtn) {
+        let hasPending = false;
+        const lastOfferIdx = emailChats.map((c,i) => c.offerEnd ? i : -1).filter(i => i >= 0).pop();
+        if (lastOfferIdx !== undefined && lastOfferIdx >= 0) {
+          const after = emailChats.slice(lastOfferIdx + 1);
+          hasPending = !after.some(c => c.sender === 'user');
+        }
+        offerBtn.disabled = hasPending || lastMessage.status === 'closed';
+        offerBtn.style.opacity = offerBtn.disabled ? '0.5' : '1';
+      }
+
+      responseArea.style.display = lastMessage.status === 'closed' ? 'none' : 'block';
+
+      // scroll messages
+      setTimeout(() => {
+        const container = document.getElementById('messages-container');
+        if (container) container.scrollTop = container.scrollHeight;
+      }, 100);
+    }
+
+    function sendAdminResponse() {
+      const response = document.getElementById('admin-response').value.trim();
+
+      if (!response) {
+        alert('Please type a response');
+        return;
+      }
+
+      if (!currentChatId) {
+        alert('No chat selected');
+        return;
+      }
+
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const adminMessage = {
+        id: 'CHAT-' + Date.now(),
+        email: currentChatId,
+        message: response,
+        sender: 'admin',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        status: 'responded'
+      };
+
+      allChats.push(adminMessage);
+      localStorage.setItem('liveChats', JSON.stringify(allChats));
+
+      document.getElementById('admin-response').value = '';
+
+      loadAllLiveChats();
+      displayLiveChats();
+      openChatSession(currentChatId);
+      alert('Response sent successfully!');
+    }
+
+    function offerEndChat() {
+      if (!currentChatId) {
+        alert('No chat selected');
+        return;
+      }
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const offerMessage = {
+        id: 'CHAT-' + Date.now(),
+        email: currentChatId,
+        message: 'Executive is offering to end the chat. Please choose "End Chat" when you are satisfied or "Need More Help" to continue.',
+        sender: 'admin',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        offerEnd: true,
+        status: 'pending-end'
+      };
+      allChats.push(offerMessage);
+      localStorage.setItem('liveChats', JSON.stringify(allChats));
+      loadAllLiveChats();
+      displayLiveChats();
+      openChatSession(currentChatId);
+      alert('Offer to end chat sent to user.');
+    }
+
+    function clearChatHistory() {
+      if (!currentChatId) {
+        alert('Select a chat session first');
+        return;
+      }
+      if (!confirm('Are you sure you want to clear the chat history for this user?')) return;
+      freeExecutive(currentChatId);
+      let allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      allChats = allChats.filter(chat => chat.email !== currentChatId);
+      localStorage.setItem('liveChats', JSON.stringify(allChats));
+      loadAllLiveChats();
+      displayLiveChats();
+      document.getElementById('chat-conversation').innerHTML = '<div class="no-chat-selected">Select a chat to view conversation</div>';
+      document.getElementById('chat-response-area').style.display = 'none';
+      alert('Chat history cleared.');
+    }
+  </script>
+</body>
+</html>

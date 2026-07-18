@@ -1,0 +1,1322 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Dashboard | Rishav Software</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="logo-section">
+        <h1 class="logo">RR</h1>
+      </div>
+      <div class="user-info">
+        <button onclick="goHome()" class="btn-home">🏠 Home</button>
+        <button onclick="toggleAIChat()" class="btn-ai-chat">🤖 AI Assistant</button>
+        <div class="user-profile">
+          <div class="user-avatar">👤</div>
+          <div class="user-details">
+            <span class="user-name" id="user-name-display">User Name</span>
+            <span class="user-email" id="user-email-display">user@example.com</span>
+          </div>
+        </div>
+        <button onclick="handleLogout()" class="btn-logout">Logout</button>
+      </div>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <nav>
+        <a href="#" onclick="showSection('dashboard')" class="nav-link active">📊 Dashboard</a>
+        <a href="products.html" class="nav-link" target="_self">🛍️ Products</a>
+        <a href="#" onclick="showSection('cart')" class="nav-link">🛒 Cart</a>
+        <a href="#" onclick="showSection('orders')" class="nav-link">📋 Order History</a>
+        <a href="#" onclick="showSection('profile')" class="nav-link">👤 Profile</a>
+        <a href="#" onclick="showSection('settings')" class="nav-link">⚙️ Settings</a>
+        <a href="#" onclick="showSection('support')" class="nav-link">🔧 Support</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="content-section active">
+        <h2>Dashboard</h2>
+        <div class="dashboard-stats">
+          <div class="stat-card" data-aos="zoom-in">
+            <h3>Total Orders</h3>
+            <p class="stat-number" id="total-orders">0</p>
+          </div>
+          <div class="stat-card" data-aos="zoom-in" data-aos-delay="100">
+            <h3>Cart Items</h3>
+            <p class="stat-number" id="cart-count">0</p>
+          </div>
+          <div class="stat-card" data-aos="zoom-in" data-aos-delay="200">
+            <h3>Total Spent</h3>
+            <p class="stat-number" id="total-spent">$0</p>
+          </div>
+        </div>
+
+        <!-- AI Recommendations Section -->
+        <div class="ai-recommendations-section" data-aos="fade-up" data-aos-delay="300">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3>🤖 AI Recommendations</h3>
+            <button onclick="loadAIRecommendations()" class="btn-refresh-rec">🔄 Refresh</button>
+          </div>
+          <div id="ai-recommendations" class="recommendations-grid">
+            <!-- Recommendations will be loaded here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Products Section -->
+      <section id="products" class="content-section">
+        <h2>Software Products</h2>
+        <div class="products-grid" id="products-grid">
+          <!-- Products will be loaded here -->
+        </div>
+      </section>
+
+      <!-- Cart Section -->
+      <section id="cart" class="content-section">
+        <h2>Shopping Cart</h2>
+        <div class="cart-container">
+          <table class="cart-table" id="cart-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="cart-body">
+              <!-- Cart items will be loaded here -->
+            </tbody>
+          </table>
+          <div class="cart-summary">
+            <p>Subtotal: <span id="subtotal">$0</span></p>
+            <p>Tax (10%): <span id="tax">$0</span></p>
+            <p class="total"><strong>Total: <span id="total">$0</span></strong></p>
+            <button class="btn-checkout" onclick="handleCheckout()">Proceed to Checkout</button>
+          </div>
+          <div id="empty-cart" class="empty-message" style="display:none;">
+            Your cart is empty!
+          </div>
+        </div>
+      </section>
+
+      <!-- Orders Section -->
+      <section id="orders" class="content-section">
+        <h2>Order History</h2>
+        <div class="orders-container">
+          <div id="orders-list">
+            <!-- Orders will be loaded here -->
+          </div>
+          <div id="no-orders" class="empty-message" style="display:none;">
+            <p>🛒 No orders yet. Start shopping to place your first order!</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Support Section -->
+      <section id="support" class="content-section">
+        <h2>Support & Help</h2>
+        <div class="support-container">
+          <div class="support-options">
+            <div class="support-item" data-aos="fade-up">
+              <h3>📧 Email Support</h3>
+              <p>Get help via email</p>
+              <button onclick="contactSupport('email')" class="btn-support">Send Email</button>
+            </div>
+            <div class="support-item" data-aos="fade-up" data-aos-delay="100">
+              <h3>💬 Live Chat</h3>
+              <p>Chat with our support team</p>
+              <button onclick="contactSupport('chat')" class="btn-support">Start Chat</button>
+            </div>
+            <div class="support-item" data-aos="fade-up" data-aos-delay="200">
+              <h3>📞 Phone Support</h3>
+              <p>Speak with our experts</p>
+              <button onclick="contactSupport('phone')" class="btn-support">Call Now</button>
+            </div>
+            <div class="support-item" data-aos="fade-up" data-aos-delay="300">
+              <h3>📚 Help Center</h3>
+              <p>Browse FAQs and guides</p>
+              <button onclick="contactSupport('help')" class="btn-support">Visit Help Center</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Profile Section -->
+      <section id="profile" class="content-section">
+        <h2>My Profile</h2>
+        <div class="profile-container">
+          <!-- Profile Header -->
+          <div class="profile-header">
+            <div class="profile-avatar">
+              <div class="avatar-circle">👤</div>
+            </div>
+            <div class="profile-basic">
+              <h3 id="profile-name"></h3>
+              <p id="profile-email"></p>
+              <p class="member-since">Member since: <span id="profile-date"></span></p>
+            </div>
+          </div>
+
+          <!-- Profile Sections -->
+          <div class="profile-sections">
+            <!-- Personal Information -->
+            <div class="profile-section-card">
+              <h4>👤 Personal Information</h4>
+              <div class="profile-details-grid">
+                <div class="detail-item">
+                  <label>Full Name:</label>
+                  <span id="profile-full-name"></span>
+                </div>
+                <div class="detail-item">
+                  <label>Email Address:</label>
+                  <span id="profile-email-detail"></span>
+                </div>
+                <div class="detail-item">
+                  <label>Account Type:</label>
+                  <span id="profile-account-type"></span>
+                </div>
+                <div class="detail-item">
+                  <label>Registration Date:</label>
+                  <span id="profile-reg-date"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Account Statistics -->
+            <div class="profile-section-card">
+              <h4>📊 Account Statistics</h4>
+              <div class="profile-stats-grid">
+                <div class="stat-box">
+                  <div class="stat-number" id="profile-total-orders">0</div>
+                  <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-number" id="profile-total-spent">$0</div>
+                  <div class="stat-label">Total Spent</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-number" id="profile-active-products">0</div>
+                  <div class="stat-label">Active Products</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-number" id="profile-avg-order">$0</div>
+                  <div class="stat-label">Avg. Order Value</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="profile-section-card">
+              <h4>🕒 Recent Activity</h4>
+              <div class="activity-list" id="recent-activity">
+                <div class="activity-item">
+                  <div class="activity-icon">🛒</div>
+                  <div class="activity-content">
+                    <p>Welcome to Rishav Software!</p>
+                    <span class="activity-time">Account created</span>
+                  </div>
+                </div>
+                <!-- More activities will be loaded here -->
+              </div>
+            </div>
+
+            <!-- Account Status -->
+            <div class="profile-section-card">
+              <h4>🔐 Account Status</h4>
+              <div class="account-status">
+                <div class="status-item">
+                  <span class="status-label">Email Verification:</span>
+                  <span class="status-value verified" id="email-verification">✔️ Verified</span>
+                </div>
+                <div class="status-item">
+                  <span class="status-label">Two-Factor Auth:</span>
+                  <span class="status-value disabled" id="two-factor-status">✖️ Disabled</span>
+                </div>
+                <div class="status-item">
+                  <span class="status-label">Subscription:</span>
+                  <span class="status-value active" id="subscription-status">✔️ Active</span>
+                </div>
+                <div class="status-item">
+                  <span class="status-label">Last Login:</span>
+                  <span class="status-value" id="last-login">Today</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Section -->
+      <section id="settings" class="content-section">
+        <h2>Account Settings</h2>
+        <div class="settings-container">
+          <div class="settings-section">
+            <h3>Personal Information</h3>
+            <form class="settings-form" onsubmit="updateProfile(event)">
+              <div class="form-group">
+                <label for="settings-name">Full Name</label>
+                <input type="text" id="settings-name" required>
+              </div>
+              <div class="form-group">
+                <label for="settings-email">Email</label>
+                <input type="email" id="settings-email" required>
+              </div>
+              <button type="submit" class="btn-settings">Update Profile</button>
+            </form>
+          </div>
+          <div class="settings-section">
+            <h3>Password</h3>
+            <form class="settings-form" onsubmit="changePassword(event)">
+              <div class="form-group">
+                <label for="current-password">Current Password</label>
+                <input type="password" id="current-password" required>
+              </div>
+              <div class="form-group">
+                <label for="new-password">New Password</label>
+                <input type="password" id="new-password" required minlength="6">
+              </div>
+              <div class="form-group">
+                <label for="confirm-password">Confirm New Password</label>
+                <input type="password" id="confirm-password" required minlength="6">
+              </div>
+              <button type="submit" class="btn-settings">Change Password</button>
+            </form>
+          </div>
+          <div class="settings-section">
+            <h3>Notifications</h3>
+            <div class="notification-settings">
+              <label class="toggle-label">
+                <input type="checkbox" id="email-notifications" checked>
+                <span class="toggle-slider"></span>
+                Email notifications for orders
+              </label>
+              <label class="toggle-label">
+                <input type="checkbox" id="product-updates" checked>
+                <span class="toggle-slider"></span>
+                Product updates and news
+              </label>
+              <label class="toggle-label">
+                <input type="checkbox" id="security-alerts">
+                <span class="toggle-slider"></span>
+                Security alerts
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Product Modal -->
+  <div id="product-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modal-title"></h2>
+      <p id="modal-description"></p>
+      <p class="modal-price">Price: <strong id="modal-price"></strong></p>
+      <input type="number" id="modal-quantity" min="1" max="10" value="1" placeholder="Quantity">
+      <button onclick="addToCart()" class="btn-add-to-cart">Add to Cart</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script src="cart.js"></script>
+  <script>
+    AOS.init({ once: true });
+
+    let cart = [];
+    let orders = [];
+    const products = [
+      { id: 1, name: 'Project Management Pro', price: 99, description: 'Advanced project management software' },
+      { id: 2, name: 'Design Studio Elite', price: 149, description: 'Professional design and graphics tool' },
+      { id: 3, name: 'Code Editor Premium', price: 79, description: 'Advanced code editing with AI assistance' },
+      { id: 4, name: 'Data Analytics Suite', price: 199, description: 'Comprehensive data analysis platform' },
+      { id: 5, name: 'Security Guardian', price: 129, description: 'Enterprise security and encryption software' },
+      { id: 6, name: 'Cloud Storage Plus', price: 59, description: 'Unlimited cloud storage solution' }
+    ];
+
+    let currentProduct = null;
+    let userEmail = null;
+
+    // Initialize
+    window.addEventListener('load', function() {
+      // dashboard should rely on sessionStorage for per-tab/multiuser support
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+      if (!isLoggedIn) {
+        alert('Please login to access your dashboard.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const userName = sessionStorage.getItem('userName') || 'Guest User';
+      userEmail = sessionStorage.getItem('userEmail') || 'guest@example.com';
+      
+      // Show profile
+      document.getElementById('user-name-display').textContent = userName;
+      document.getElementById('user-email-display').textContent = userEmail;
+      
+      loadCart();
+      loadOrders();
+      loadProducts();
+      loadAIRecommendations();
+      updateStats();
+
+      // Check URL hash for section
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        showSection(hash);
+      }
+
+      // Load profile info
+      loadProfile();
+
+      // Auto-refresh order status every 5 seconds to catch admin updates
+      setInterval(function() {
+        if (document.getElementById('orders').classList.contains('active')) {
+          loadOrders();
+          updateStats();
+        }
+      }, 5000);
+    });
+
+    function loadProducts() {
+      const grid = document.getElementById('products-grid');
+      grid.innerHTML = products.map(product => `
+        <div class="product-card" data-aos="fade-up">
+          <h3>${product.name}</h3>
+          <p>${product.description}</p>
+          <p class="price">$${product.price}</p>
+          <button onclick="openProductModal(${product.id})" class="btn-view">View Details</button>
+        </div>
+      `).join('');
+    }
+
+    function openProductModal(productId) {
+      currentProduct = products.find(p => p.id === productId);
+      document.getElementById('modal-title').textContent = currentProduct.name;
+      document.getElementById('modal-description').textContent = currentProduct.description;
+      document.getElementById('modal-price').textContent = `$${currentProduct.price}`;
+      document.getElementById('modal-quantity').value = 1;
+      document.getElementById('product-modal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('product-modal').style.display = 'none';
+    }
+
+    async function addToCart() {
+      const quantity = parseInt(document.getElementById('modal-quantity').value);
+      const result = await addToCartAPI(
+        String(currentProduct.id),
+        currentProduct.name,
+        currentProduct.price,
+        quantity
+      );
+
+      if (result.success) {
+        closeModal();
+        alert('Added to cart!');
+        await loadCart();
+        updateStats();
+      } else {
+        alert(result.message || 'Failed to add to cart');
+      }
+    }
+
+    async function loadCart() {
+      cart = await fetchCart();
+      updateCartDisplay();
+    }
+
+    function saveCart() {
+      // Cart saved automatically via API
+    }
+
+    function updateCartDisplay() {
+      const tbody = document.getElementById('cart-body');
+      const emptyCart = document.getElementById('empty-cart');
+
+      if (!cart || cart.length === 0) {
+        tbody.innerHTML = '';
+        emptyCart.style.display = 'block';
+        updateCartSummary();
+        return;
+      }
+
+      emptyCart.style.display = 'none';
+      tbody.innerHTML = cart.map((item, index) => `
+        <tr>
+          <td>${item.name}</td>
+          <td>$${item.price}</td>
+          <td>
+            <input type="number" min="1" value="${item.quantity}" onchange="updateQuantity(${index}, this.value, '${item.productId}')">
+          </td>
+          <td>$${(item.price * item.quantity).toFixed(2)}</td>
+          <td><button onclick="removeFromCart('${item.productId}')" class="btn-remove">Remove</button></td>
+        </tr>
+      `).join('');
+
+      updateCartSummary();
+    }
+
+    async function updateQuantity(index, quantity, productId) {
+      await updateCartItemAPI(productId, parseInt(quantity));
+      await loadCart();
+      updateStats();
+    }
+
+    async function removeFromCart(productId) {
+      await removeFromCartAPI(productId);
+      await loadCart();
+      updateStats();
+    }
+
+    function updateCartSummary() {
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const tax = subtotal * 0.1;
+      const total = subtotal + tax;
+
+      document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+      document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
+      document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+    }
+
+    function handleCheckout() {
+      if (!cart || cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
+      }
+      window.location.href = 'checkout.html';
+    }
+
+    function loadProfile() {
+      const userName = sessionStorage.getItem('userName') || 'User';
+      const userEmail = sessionStorage.getItem('userEmail');
+      const allUsers = JSON.parse(localStorage.getItem('all-users') || '{}');
+      const userData = allUsers[userEmail] || {};
+      
+      // Basic info
+      document.getElementById('profile-name').textContent = userName;
+      document.getElementById('profile-email').textContent = userEmail;
+      document.getElementById('profile-full-name').textContent = userName;
+      document.getElementById('profile-email-detail').textContent = userEmail;
+      document.getElementById('profile-date').textContent = userData.registrationDate || new Date().toLocaleDateString();
+      document.getElementById('profile-reg-date').textContent = userData.registrationDate || new Date().toLocaleDateString();
+      
+      // Account type based on order history
+      const orders = userData.orders || [];
+      const accountType = orders.length > 5 ? 'Premium User' : orders.length > 0 ? 'Active User' : 'New User';
+      document.getElementById('profile-account-type').textContent = accountType;
+      
+      // Statistics
+      const totalOrders = orders.length;
+      const totalSpent = orders.reduce((sum, order) => sum + order.amount, 0);
+      const avgOrder = totalOrders > 0 ? (totalSpent / totalOrders).toFixed(2) : 0;
+      const activeProducts = orders.filter(order => order.status === 'Completed').length; // Simplified
+      
+      document.getElementById('profile-total-orders').textContent = totalOrders;
+      document.getElementById('profile-total-spent').textContent = `$${totalSpent.toFixed(2)}`;
+      document.getElementById('profile-active-products').textContent = activeProducts;
+      document.getElementById('profile-avg-order').textContent = `$${avgOrder}`;
+      
+      // Recent activity
+      loadRecentActivity(orders);
+      
+      // Account status
+      updateAccountStatus(userData);
+      
+      // Last login
+      const lastLogin = localStorage.getItem('lastLogin') || 'First login';
+      document.getElementById('last-login').textContent = lastLogin;
+      
+      // Update last login
+      localStorage.setItem('lastLogin', new Date().toLocaleDateString());
+      
+      // Load settings form
+      document.getElementById('settings-name').value = userName;
+      document.getElementById('settings-email').value = userEmail;
+    }
+
+    function updateAccountStatus(userData) {
+      // Email verification - assume verified if account exists
+      document.getElementById('email-verification').textContent = '✔️ Verified';
+      document.getElementById('email-verification').className = 'status-value verified';
+      
+      // Two-factor auth - check if enabled (could be stored in userData)
+      const twoFactorEnabled = userData.twoFactorEnabled || false;
+      document.getElementById('two-factor-status').textContent = twoFactorEnabled ? '✔️ Enabled' : '✖️ Disabled';
+      document.getElementById('two-factor-status').className = twoFactorEnabled ? 'status-value verified' : 'status-value disabled';
+      
+      // Subscription status based on recent activity
+      const orders = userData.orders || [];
+      const hasRecentOrder = orders.some(order => {
+        const orderDate = new Date(order.date);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        return orderDate > thirtyDaysAgo;
+      });
+      
+      const subscriptionStatus = hasRecentOrder ? '✔️ Active' : orders.length > 0 ? '⏸️ Inactive' : '✖️ None';
+      const subscriptionClass = hasRecentOrder ? 'verified' : orders.length > 0 ? 'active' : 'disabled';
+      document.getElementById('subscription-status').textContent = subscriptionStatus;
+      document.getElementById('subscription-status').className = `status-value ${subscriptionClass}`;
+    }
+
+    function loadRecentActivity(orders) {
+      const activityList = document.getElementById('recent-activity');
+      const recentOrders = orders.slice(-5).reverse(); // Last 5 orders
+      
+      let activityHTML = `
+        <div class="activity-item">
+          <div class="activity-icon">🎉</div>
+          <div class="activity-content">
+            <p>Welcome to Rishav Software!</p>
+            <span class="activity-time">Account created</span>
+          </div>
+        </div>
+      `;
+      
+      // Add login activity
+      const lastLogin = localStorage.getItem('lastLogin');
+      if (lastLogin && lastLogin !== 'First login') {
+        activityHTML += `
+          <div class="activity-item">
+            <div class="activity-icon">📑</div>
+            <div class="activity-content">
+              <p>Logged into account</p>
+              <span class="activity-time">${lastLogin}</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Add recent orders
+      recentOrders.forEach(order => {
+        activityHTML += `
+          <div class="activity-item">
+            <div class="activity-icon">🛒</div>
+            <div class="activity-content">
+              <p>Order #${order.id} completed</p>
+              <span class="activity-time">${order.date} - $${order.amount.toFixed(2)}</span>
+            </div>
+          </div>
+        `;
+      });
+      
+      // Add profile update activity if recent
+      const profileUpdated = localStorage.getItem('profileLastUpdated');
+      if (profileUpdated) {
+        const updateDate = new Date(profileUpdated);
+        const now = new Date();
+        const daysSinceUpdate = Math.floor((now - updateDate) / (1000 * 60 * 60 * 24));
+        
+        if (daysSinceUpdate < 7) {
+          activityHTML += `
+            <div class="activity-item">
+              <div class="activity-icon">👤</div>
+              <div class="activity-content">
+                <p>Profile information updated</p>
+                <span class="activity-time">${updateDate.toLocaleDateString()}</span>
+              </div>
+            </div>
+          `;
+        }
+      }
+      
+      activityList.innerHTML = activityHTML;
+    }
+
+    function updateProfile(event) {
+      event.preventDefault();
+      const newName = document.getElementById('settings-name').value;
+      const newEmail = document.getElementById('settings-email').value;
+      
+      if (newEmail !== userEmail) {
+        alert('Email change not supported in demo. Please contact support.');
+        return;
+      }
+      
+      localStorage.setItem('userName', newName);
+      localStorage.setItem('profileLastUpdated', new Date().toISOString());
+      alert('Profile updated successfully!');
+      loadProfile();
+    }
+
+    function changePassword(event) {
+      event.preventDefault();
+      const currentPass = document.getElementById('current-password').value;
+      const newPass = document.getElementById('new-password').value;
+      const confirmPass = document.getElementById('confirm-password').value;
+      
+      if (newPass !== confirmPass) {
+        alert('New passwords do not match!');
+        return;
+      }
+      
+      const users = JSON.parse(localStorage.getItem('users') || '{}');
+      if (users[userEmail] && users[userEmail].password === currentPass) {
+        users[userEmail].password = newPass;
+        localStorage.setItem('users', JSON.stringify(users));
+        alert('Password changed successfully!');
+        document.getElementById('current-password').value = '';
+        document.getElementById('new-password').value = '';
+        document.getElementById('confirm-password').value = '';
+      } else {
+        alert('Current password is incorrect!');
+      }
+    }
+
+    function contactSupport(type) {
+      switch(type) {
+        case 'email':
+          window.location.href = 'mailto:support@rishavsoft.com?subject=Support Request';
+          break;
+        case 'chat':
+          openLiveChat();
+          break;
+        case 'phone':
+          window.location.href = 'tel:+91-9211585089';
+          break;
+        case 'help':
+          alert('Help center feature coming soon! Please check our documentation.');
+          break;
+      }
+    }
+
+    async function openLiveChat() {
+      // Check chat status first
+      try {
+        const response = await fetch('http://127.0.0.1:3000/api/chat/status');
+        const data = await response.json();
+
+        if (data.success) {
+          if (data.waitTime === 0) {
+            // Executive available, join chat immediately
+            await joinChatQueue();
+          } else {
+            // Show wait time confirmation
+            const confirmChat = confirm(
+              `All executives are currently busy.\n\n` +
+              `Estimated wait time: ${data.waitTimeText}\n` +
+              `Queue position: ${data.queuePosition}\n` +
+              `Available executives: ${data.availableExecutives}/${data.totalExecutives}\n\n` +
+              `Would you like to join the queue?`
+            );
+            if (confirmChat) {
+              await joinChatQueue();
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking chat status:', error);
+        alert('Unable to check chat status. Please try again.');
+      }
+    }
+
+    async function joinChatQueue() {
+      try {
+        const response = await fetch('http://127.0.0.1:3000/api/chat/join', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: userEmail })
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          // Show live chat modal
+          const modal = document.getElementById('live-chat-modal') || createLiveChatModal();
+          modal.style.display = 'flex';
+          loadLiveChatHistory();
+
+          // Show connection status
+          const container = document.getElementById('chat-messages-container');
+          if (data.status === 'connected') {
+            container.innerHTML = `
+              <div style="color: #00ff88; text-align: center; padding: 20px;">
+                <div style="font-size: 24px; margin-bottom: 10px;">✅</div>
+                <div style="font-size: 16px; font-weight: 600;">Connected to ${data.executive.name}</div>
+                <div style="font-size: 14px; opacity: 0.8; margin-top: 5px;">You can start chatting now</div>
+              </div>
+            `;
+          } else if (data.status === 'queued') {
+            container.innerHTML = `
+              <div style="color: #ffa500; text-align: center; padding: 20px;">
+                <div style="font-size: 24px; margin-bottom: 10px;">⏳</div>
+                <div style="font-size: 16px; font-weight: 600;">You are in queue</div>
+                <div style="font-size: 14px; opacity: 0.8; margin-top: 5px;">Position: ${data.queuePosition}</div>
+                <div style="font-size: 14px; opacity: 0.8; margin-top: 5px;">Estimated wait: ${data.waitTimeText}</div>
+                <div style="font-size: 12px; opacity: 0.6; margin-top: 10px;">An executive will connect with you shortly</div>
+              </div>
+            `;
+          }
+        } else {
+          alert(data.message || 'Failed to join chat queue');
+        }
+      } catch (error) {
+        console.error('Error joining chat queue:', error);
+        alert('Unable to join chat. Please try again.');
+      }
+    }
+
+    function createLiveChatModal() {
+      const modal = document.createElement('div');
+      modal.id = 'live-chat-modal';
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+      `;
+      modal.innerHTML = `
+        <div style="background: linear-gradient(120deg, #000, #1a0033); width: 500px; height: 600px; border-radius: 12px; border: 2px solid #00c6ff; padding: 20px; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #00c6ff; padding-bottom: 15px;">
+            <h3 style="color: #00c6ff; margin: 0;">💬 Live Chat Support</h3>
+            <div style="display:flex; align-items:center;">
+              <button class="btn-end-chat" onclick="userEndChat()" style="display:none; background:#ff4444; border:none; color:#fff; padding:4px 8px; border-radius:6px; cursor:pointer; margin-right:10px;">End Chat</button>
+              <button onclick="closeLiveChat()" style="background: none; border: none; color: #00ff88; font-size: 24px; cursor: pointer;">✔️</button>
+            </div>
+          </div>
+          <div id="chat-messages-container" style="flex: 1; overflow-y: auto; margin-bottom: 15px; padding: 10px; border: 1px solid #00c6ff; border-radius: 8px;">
+            <!-- Messages will appear here -->
+          </div>
+          <div id="offer-end-controls" style="display:none; text-align:center; margin-bottom:10px;">
+            <button onclick="handleOfferResponse('needMore')" class="btn-offer" style="margin-right:8px;">Need More Help</button>
+            <button onclick="handleOfferResponse('end')" class="btn-offer">End Chat</button>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="live-chat-input" placeholder="Type message..." style="flex: 1; padding: 10px; background: rgba(255,255,255,0.08); border: 2px solid rgba(0,198,255,0.3); border-radius: 8px; color: white; font-size: 14px;" onkeypress="if(event.key==='Enter') sendLiveChatMessage()">
+            <button onclick="sendLiveChatMessage()" style="padding: 10px 20px; background: linear-gradient(135deg, #00c6ff, #00ff88); border: none; border-radius: 8px; color: black; font-weight: 600; cursor: pointer;">Send</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      return modal;
+    }
+
+    function loadLiveChatHistory() {
+      const container = document.getElementById('chat-messages-container');
+      const offerControls = document.getElementById('offer-end-controls');
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const userChats = allChats.filter(chat => chat.email === userEmail);
+      
+      if (userChats.length === 0) {
+        container.innerHTML = `<div style="color: #00c6ff; text-align: center; padding: 20px;">No previous chats. Start typing below!</div>`;
+        if (offerControls) offerControls.style.display = 'none';
+        return;
+      }
+
+      container.innerHTML = userChats.map(msg => `
+        <div style="margin-bottom: 10px; padding: 8px; border-radius: 6px; background: ${msg.sender === 'user' ? 'linear-gradient(135deg, #00c6ff, #00ff88)' : 'rgba(0,198,255,0.1)'}; color: ${msg.sender === 'user' ? 'black' : '#00c6ff'};">
+          <strong>${msg.sender === 'user' ? 'You' : 'Support'}:</strong> ${msg.message}
+          <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 5px;">${msg.time}</div>
+        </div>
+      `).join('');
+
+      // check for pending offer and show response buttons
+      let lastOffer = null;
+      let offerIdx = -1;
+      userChats.forEach((msg, idx) => {
+        // ignore any self-offers (shouldn't exist) – only support staff can create them
+        if (msg.offerEnd && msg.sender !== 'user') { lastOffer = msg; offerIdx = idx; }
+      });
+      if (lastOffer) {
+        const responded = userChats.slice(offerIdx + 1).some(c => c.offerEndResponse);
+        if (!responded && offerControls) offerControls.style.display = 'flex';
+        else if (offerControls) offerControls.style.display = 'none';
+      } else if (offerControls) {
+        offerControls.style.display = 'none';
+      }
+
+      // end-chat button visibility/disabled state
+      const endBtn = document.querySelector('.btn-end-chat');
+      if (endBtn) {
+        if (lastOffer && lastOffer.sender !== 'user') {
+          // show it; disable if already closed
+          endBtn.style.display = 'inline-block';
+          const lastMsg = userChats[userChats.length - 1];
+          endBtn.disabled = lastMsg && lastMsg.status === 'closed';
+          endBtn.style.opacity = endBtn.disabled ? '0.5' : '1';
+        } else {
+          endBtn.style.display = 'none';
+        }
+      }
+
+      // Scroll to bottom
+      setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+      }, 100);
+    }
+
+    function sendLiveChatMessage() {
+      const input = document.getElementById('live-chat-input');
+      const message = input.value.trim();
+
+      if (!message) {
+        alert('Please type a message');
+        return;
+      }
+
+      // prevent sending if chat already closed
+      const existingChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const last = existingChats.filter(c => c.email === userEmail).pop();
+      if (last && last.status === 'closed') {
+        alert('This chat session has been closed. Please start a new conversation if needed.');
+        return;
+      }
+
+      // Create chat message object
+      const chatMessage = {
+        id: 'CHAT-' + Date.now(),
+        email: userEmail,
+        message: message,
+        sender: 'user',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        status: 'pending'
+      };
+
+      // Save to localStorage
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      allChats.push(chatMessage);
+      localStorage.setItem('liveChats', JSON.stringify(allChats));
+
+      // Clear input and reload
+      input.value = '';
+      loadLiveChatHistory();
+
+      // Show confirmation
+      alert('Message sent! An admin will respond shortly.');
+    }
+
+    async function closeLiveChat() {
+      // Leave chat queue
+      try {
+        await fetch('http://127.0.0.1:3000/api/chat/leave', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: userEmail })
+        });
+      } catch (error) {
+        console.error('Error leaving chat:', error);
+      }
+
+      const modal = document.getElementById('live-chat-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    // respond to an admin/executive offer to end the chat
+    function handleOfferResponse(choice) {
+      const responseMsg = {
+        id: 'CHAT-' + Date.now(),
+        email: userEmail,
+        message: choice === 'end' ? 'Thank you for your help.' : 'I need more assistance.',
+        sender: 'user',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        offerEndResponse: choice
+      };
+      if (choice === 'end') {
+        responseMsg.status = 'closed';
+      }
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      allChats.push(responseMsg);
+      localStorage.setItem('liveChats', JSON.stringify(allChats));
+      if (choice === 'end') {
+        closeLiveChat();
+      }
+      loadLiveChatHistory();
+    }
+
+    // allow user to close session proactively
+    function userEndChat() {
+      if (!confirm('Are you sure you want to end the chat?')) return;
+      const endMsg = {
+        id: 'CHAT-' + Date.now(),
+        email: userEmail,
+        message: 'Chat ended by user.',
+        sender: 'user',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        offerEndResponse: 'end',
+        status: 'closed'
+      };
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      allChats.push(endMsg);
+      localStorage.setItem('liveChats', JSON.stringify(allChats));
+      loadLiveChatHistory();
+      closeLiveChat();
+    }
+
+    async function loadOrders() {
+      const data = await fetchOrdersAPI();
+      if (data.success) {
+        orders = (data.orders || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        updateOrdersDisplay();
+      }
+    }
+
+    function updateOrdersDisplay() {
+      const ordersList = document.getElementById('orders-list');
+      const noOrders = document.getElementById('no-orders');
+
+      if (orders.length === 0) {
+        ordersList.innerHTML = '';
+        noOrders.style.display = 'block';
+        return;
+      }
+
+      noOrders.style.display = 'none';
+
+      const statusColors = {
+        pending: '#fff3cd',
+        confirmed: '#d1ecf1',
+        preparing: '#d4edda',
+        building: '#cce5ff',
+        ready: '#e2e3e5',
+        completed: '#d4edda',
+        cancelled: '#f8d7da'
+      };
+
+      const statusText = {
+        pending: '⏳ Pending',
+        confirmed: '✅ Confirmed',
+        preparing: '🔧 Preparing',
+        building: '🏗️ Building',
+        ready: '📦 Ready',
+        completed: '✨ Completed',
+        cancelled: '❌ Cancelled'
+      };
+
+      ordersList.innerHTML = orders.map(order => `
+        <div class="order-card" data-aos="fade-up">
+          <div class="order-header">
+            <div class="order-id">
+              <strong>Order ID:</strong> ${order.orderId}
+            </div>
+            <div class="order-date">
+              ${new Date(order.createdAt).toLocaleDateString()}
+            </div>
+          </div>
+          
+          <div class="order-status" style="background: ${statusColors[order.status] || '#f5f5f5'}">
+            ${statusText[order.status] || order.status.toUpperCase()}
+          </div>
+
+          <div class="order-items">
+            ${order.items.map(item => `
+              <div class="order-item">
+                <span>${item.name} x${item.quantity}</span>
+                <span>$${(item.price * item.quantity).toFixed(2)}</span>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="order-total">
+            <strong>Total: $${order.totalAmount.toFixed(2)}</strong>
+          </div>
+
+          ${order.customization ? `
+            <div class="order-customization">
+              <strong>Customization:</strong> ${order.customization}
+            </div>
+          ` : ''}
+
+          <div class="order-tracking">
+            <strong>Tracking History:</strong>
+            <div class="tracking-timeline">
+              ${order.trackingHistory ? order.trackingHistory.map((track, index) => `
+                <div class="tracking-item ${index === order.trackingHistory.length - 1 ? 'latest' : ''}">
+                  <div class="tracking-dot"></div>
+                  <div class="tracking-info">
+                    <div class="tracking-status">${track.status.toUpperCase()}</div>
+                    <div class="tracking-time">${new Date(track.timestamp).toLocaleString()}</div>
+                    ${track.note ? `<div class="tracking-note">${track.note}</div>` : ''}
+                  </div>
+                </div>
+              `).join('') : '<div class="tracking-item"><div class="tracking-info">No tracking history available</div></div>'}
+            </div>
+          </div>
+
+          <div class="order-actions">
+            <button onclick="viewReceipt('${order.orderId}')" class="btn-view-receipt">🧾 View Receipt</button>
+            ${order.downloadLink ? `
+              <a href="${order.downloadLink}" target="_blank" class="btn-download">⬇️ Download Software</a>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function viewReceipt(orderId) {
+      const token = sessionStorage.getItem('token');
+      try {
+        const response = await fetch(`http://127.0.0.1:3000/api/orders/${orderId}/receipt`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const receiptHtml = await response.text();
+          const receiptWindow = window.open('', '_blank');
+          receiptWindow.document.write(receiptHtml);
+          receiptWindow.document.close();
+        } else {
+          alert('Failed to load receipt');
+        }
+      } catch (error) {
+        console.error('Error loading receipt:', error);
+        alert('Unable to load receipt');
+      }
+    }
+
+    async function loadAIRecommendations() {
+      const token = sessionStorage.getItem('token');
+      const recommendationsContainer = document.getElementById('ai-recommendations');
+
+      try {
+        const response = await fetch('http://127.0.0.1:3000/api/ai/recommendations', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.recommendations) {
+          recommendationsContainer.innerHTML = data.recommendations.map(rec => `
+            <div class="recommendation-card" data-aos="zoom-in">
+              <div class="rec-icon">🤖</div>
+              <div class="rec-content">
+                <h4>${rec.name}</h4>
+                <p class="rec-description">${rec.description}</p>
+                <p class="rec-price">$${rec.price}</p>
+                <p class="rec-reason">✨ ${rec.reason}</p>
+              </div>
+              <button onclick="addRecommendationToCart('${rec.id}')" class="btn-add-rec">Add to Cart</button>
+            </div>
+          `).join('');
+        } else {
+          recommendationsContainer.innerHTML = '<p style="color: #00c6ff; text-align: center;">Unable to load recommendations</p>';
+        }
+      } catch (error) {
+        console.error('Error loading recommendations:', error);
+        recommendationsContainer.innerHTML = '<p style="color: #ff4444; text-align: center;">Failed to load recommendations</p>';
+      }
+    }
+
+    async function addRecommendationToCart(recId) {
+      alert('This is a recommended product. Please visit the Products page to add items to your cart.');
+      window.location.href = 'products.html';
+    }
+
+    function updateStats() {
+      document.getElementById('total-orders').textContent = orders.length;
+      const cartItemCount = cart ? cart.reduce((sum, item) => sum + item.quantity, 0) : 0;
+      document.getElementById('cart-count').textContent = cartItemCount;
+      const totalSpent = orders.reduce((sum, order) => sum + (order.totalAmount || order.amount || 0), 0);
+      document.getElementById('total-spent').textContent = `$${totalSpent.toFixed(2)}`;
+    }
+
+    function showSection(sectionId) {
+      // Hide all sections
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      
+      // Remove active from all nav links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      
+      // Show selected section
+      document.getElementById(sectionId).classList.add('active');
+      
+      // Add active to clicked nav link
+      event.target.classList.add('active');
+
+      // Refresh orders when viewing them to get latest admin updates
+      if (sectionId === 'orders') {
+        loadOrders();
+        updateStats();
+      }
+      // Refresh cart when viewing cart
+      if (sectionId === 'cart') {
+        loadCart();
+        updateStats();
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('isLoggedIn');
+      sessionStorage.removeItem('userName');
+      sessionStorage.removeItem('userEmail');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('refreshToken');
+      alert('Logged out successfully!');
+      window.location.href = 'index.html';
+    }
+
+    function goHome() {
+      // Check if user is logged in
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+      if (isLoggedIn) {
+        // Keep logged-in user on dashboard
+        showSection('dashboard');
+        event.target.blur();
+      } else {
+        // Non-logged in user goes to homepage
+        window.location.href = 'index.html';
+      }
+    }
+
+    // AI Chat Functions
+    function toggleAIChat() {
+      const aiChatModal = document.getElementById('ai-chat-modal');
+      if (aiChatModal) {
+        aiChatModal.style.display = aiChatModal.style.display === 'flex' ? 'none' : 'flex';
+      } else {
+        createAIChatModal();
+      }
+    }
+
+    function createAIChatModal() {
+      const modal = document.createElement('div');
+      modal.id = 'ai-chat-modal';
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 3000;
+      `;
+      modal.innerHTML = `
+        <div style="background: linear-gradient(120deg, #000, #1a0033); width: 450px; height: 600px; border-radius: 12px; border: 2px solid #00c6ff; padding: 20px; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #00c6ff; padding-bottom: 15px;">
+            <h3 style="color: #00c6ff; margin: 0;">🤖 AI Assistant</h3>
+            <button onclick="toggleAIChat()" style="background: none; border: none; color: #00ff88; font-size: 24px; cursor: pointer;">✖️</button>
+          </div>
+          <div id="ai-chat-messages" style="flex: 1; overflow-y: auto; margin-bottom: 15px; padding: 10px; border: 1px solid #00c6ff; border-radius: 8px;">
+            <div style="color: #00c6ff; text-align: center; padding: 20px;">
+              <div style="font-size: 24px; margin-bottom: 10px;">🤖</div>
+              <div style="font-size: 14px;">Hello! I'm your AI assistant. How can I help you today?</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="ai-chat-input" placeholder="Ask me anything..." style="flex: 1; padding: 10px; background: rgba(255,255,255,0.08); border: 2px solid rgba(0,198,255,0.3); border-radius: 8px; color: white; font-size: 14px;" onkeypress="if(event.key==='Enter') sendAIMessage()">
+            <button onclick="sendAIMessage()" style="padding: 10px 20px; background: linear-gradient(135deg, #00c6ff, #00ff88); border: none; border-radius: 8px; color: black; font-weight: 600; cursor: pointer;">Send</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    async function sendAIMessage() {
+      const input = document.getElementById('ai-chat-input');
+      const message = input.value.trim();
+      
+      if (!message) return;
+      
+      const messagesContainer = document.getElementById('ai-chat-messages');
+      
+      // Add user message
+      messagesContainer.innerHTML += `
+        <div style="margin-bottom: 10px; padding: 8px; border-radius: 6px; background: linear-gradient(135deg, #00c6ff, #00ff88); color: black; text-align: right;">
+          <strong>You:</strong> ${message}
+        </div>
+      `;
+      
+      input.value = '';
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      
+      // Add loading indicator
+      messagesContainer.innerHTML += `
+        <div id="ai-loading" style="margin-bottom: 10px; padding: 8px; border-radius: 6px; background: rgba(0,198,255,0.1); color: #00c6ff;">
+          <strong>AI:</strong> Thinking...
+        </div>
+      `;
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      
+      try {
+        const response = await fetch('http://127.0.0.1:3000/api/ai/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+        
+        const data = await response.json();
+        
+        // Remove loading indicator
+        const loading = document.getElementById('ai-loading');
+        if (loading) loading.remove();
+        
+        if (data.success) {
+          messagesContainer.innerHTML += `
+            <div style="margin-bottom: 10px; padding: 8px; border-radius: 6px; background: rgba(0,198,255,0.1); color: #00c6ff;">
+              <strong>AI:</strong> ${data.response}
+            </div>
+          `;
+        } else {
+          messagesContainer.innerHTML += `
+            <div style="margin-bottom: 10px; padding: 8px; border-radius: 6px; background: rgba(255,0,0,0.1); color: #ff4444;">
+              <strong>AI:</strong> Sorry, I encountered an error. Please try again.
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('AI chat error:', error);
+        const loading = document.getElementById('ai-loading');
+        if (loading) loading.remove();
+        
+        messagesContainer.innerHTML += `
+          <div style="margin-bottom: 10px; padding: 8px; border-radius: 6px; background: rgba(255,0,0,0.1); color: #ff4444;">
+            <strong>AI:</strong> Unable to connect. Please check your connection.
+          </div>
+        `;
+      }
+      
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('product-modal');
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+      
+      const aiModal = document.getElementById('ai-chat-modal');
+      if (event.target == aiModal) {
+        aiModal.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
+
+

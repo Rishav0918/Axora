@@ -1,0 +1,200 @@
+﻿<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Axora Soft</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <h1 data-aos="fade-down" data-aos-duration="1500" class="logo">AS</h1>
+        <nav>
+          <a data-aos="fade-down" data-aos-duration="1500" href="#">HOME</a>
+            <a data-aos="fade-down" data-aos-duration="2000" href="about.html">ABOUT</a>
+            <a data-aos="fade-down" data-aos-duration="2500" href="products.html">PRICING</a>
+          <a data-aos="fade-down" data-aos-duration="3000" href="#contact">CONTACT US</a>
+        </nav>
+        <button data-aos="fade-down" data-aos-duration="1500" class="btn-signin" onclick="window.location.href='login.html'">SIGN IN</button>
+      </header>
+      <main>
+
+        <div class="content">
+          <spline-viewer class="model-3d" url="https://prod.spline.design/V5NVPHi2yqCD3Fh5/scene.splinecode"></spline-viewer>
+
+          <div data-aos="fade-zoom-in"
+          data-aos-easing="ease-in-back"
+          data-aos-delay="300"
+          data-aos-offset="0"
+          data-aos-duration="1500" class="tag-box">
+            <div class="tag">INTRODUCING &wedbar;</div>
+          </div>
+          <h1 data-aos="fade-zoom-in"
+          data-aos-easing="ease-in-back"
+          data-aos-delay="300"
+          data-aos-offset="0"
+          data-aos-duration="2000">Axora Soft</h1>
+          <p data-aos="fade-zoom-in"
+          data-aos-easing="ease-in-back"
+          data-aos-delay="300"
+          data-aos-offset="0"
+          data-aos-duration="2500" class="description">
+          Axora Soft creates scalable SaaS products, AI automation systems, and premium digital solutions for modern startups.
+          </p>
+          <div data-aos="fade-zoom-in"
+          data-aos-easing="ease-in-back"
+          data-aos-delay="300"
+          data-aos-offset="0"
+          data-aos-duration="3000" class="buttons">
+            <a href="about.html" class="btn-get-started">Documentation &gt;</a>
+            <a href="login.html" class="btn-signing-main">Getstarted &gt;</a>
+          </div>
+
+        </div>
+      </main>
+    </div>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+      <div class="contact-container">
+        <h2 data-aos="fade-up" data-aos-duration="1500">Get In Touch</h2>
+        <p data-aos="fade-up" data-aos-duration="2000" class="contact-subtitle">We'd love to hear from you. Send us a message!</p>
+        
+        <div class="contact-content">
+          <!-- Contact Info -->
+          <div class="contact-info" style="background: black;" data-aos="fade-right" data-aos-duration="1500">
+            <h3>Contact Information</h3>
+            
+            <div class="info-item">
+              <div class="info-icon">📧</div>
+              <div class="info-details">
+                <h4>Email</h4>
+                <p><a href="mailto:info@rishavsoft.com">info@rishavsoft.com</a></p>
+                <p><a href="mailto:support@rishavsoft.com">support@rishavsoft.com</a></p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-icon">📞</div>
+              <div class="info-details">
+                <h4>Phone</h4>
+                <p><a href="tel:+91-9876543210">+91-6299867638</a></p>
+                <p><a href="tel:+91-9123456789">+91-9211585089</a></p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-icon">📍</div>
+              <div class="info-details">
+                <h4>Address</h4>
+                <p>Axora Soft<br>
+                Tech Park, 123 Innovation Drive<br>
+                Bangalore, Karnataka 560001<br>
+                India</p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-icon">⏰</div>
+              <div class="info-details">
+                <h4>Business Hours</h4>
+                <p>Monday - Friday: 9:00 AM - 6:00 PM IST<br>
+                Saturday: 10:00 AM - 4:00 PM IST<br>
+                Sunday: Closed</p>
+              </div>
+            </div>
+
+            <div class="social-links">
+              <a href="https://facebook.com" class="social-link" target="_blank">f</a>
+              <a href="https://twitter.com" class="social-link" target="_blank">ð•</a>
+              <a href="https://www.linkedin.com/in/rishavraj0918" class="social-link" target="_blank">in</a>
+              <a href="https://www.instagram.com/__r_i__s_h_u__?igsh=MzRybzZweDcyNXkwNQ==" class="social-link" target="_blank">📸</a>
+            </div>
+          </div>
+
+          <!-- Contact Form -->
+          <div class="contact-form-wrapper" data-aos="fade-left" data-aos-duration="1500">
+            <form class="contact-form" style="background: black;" onsubmit="handleContactSubmit(event)">
+              <div class="form-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" required placeholder="Enter your full name">
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
+              </div>
+
+              <div class="form-group">
+                <label for="subject">Subject</label>
+                <select id="subject" name="subject" required>
+                  <option value="">Select a subject</option>
+                  <option value="General Inquiry">General Inquiry</option>
+                  <option value="Product Support">Product Support</option>
+                  <option value="Sales">Sales</option>
+                  <option value="Partnership">Partnership</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" required placeholder="Tell us how we can help..." rows="5"></textarea>
+              </div>
+
+              <button type="submit" class="btn-submit">Send Message</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="script.js"></script>
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+      AOS.init();
+
+      function handleContactSubmit(event) {
+        event.preventDefault();
+        
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // Store contact message
+        const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+        const contactMessage = {
+          id: 'CONT-' + Date.now(),
+          name: name,
+          email: email,
+          phone: phone,
+          subject: subject,
+          message: message,
+          date: new Date().toLocaleDateString(),
+          time: new Date().toLocaleTimeString()
+        };
+        
+        contacts.push(contactMessage);
+        localStorage.setItem('contacts', JSON.stringify(contacts));
+
+        // Show success message
+        alert('Thank you for your message! We will get back to you soon.');
+        
+        // Reset form
+        document.querySelector('.contact-form').reset();
+      }
+    </script>
+  </body>
+</html>
+
+

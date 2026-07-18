@@ -1,0 +1,748 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Products | Rishav Software</title>
+  <link rel="stylesheet" href="products.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body>
+  <div class="products-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">RR</div>
+      <nav class="nav">
+        <a href="#" onclick="goHome(event)" class="nav-link">Home</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="#" class="nav-link active">Products</a>
+      </nav>
+      <div class="header-actions">
+        <div class="user-profile-small">
+          <span class="user-icon">👤</span>
+          <div class="user-info-small">
+            <span class="user-name-small" id="user-name">Guest User</span>
+            <span class="user-email-small" id="user-email">guest@example.com</span>
+          </div>
+        </div>
+        <button onclick="goToDashboard()" class="btn-cart">
+          🛒 Checkout
+          <span class="cart-badge" id="cart-count">0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Category Filter -->
+    <div class="category-filter">
+      <button class="filter-btn active" onclick="filterCategory('all', event)">All Products</button>
+      <button class="filter-btn" onclick="filterCategory('apps', event)">📱 Apps</button>
+      <button class="filter-btn" onclick="filterCategory('software', event)">💻 Software</button>
+      <button class="filter-btn" onclick="filterCategory('solutions', event)">⚙️ Solutions</button>
+    </div>
+
+    <!-- Products Grid -->
+    <main class="products-section">
+      <h1>Our Products & Services</h1>
+      <div class="products-grid" id="products-grid">
+        <!-- Products will be loaded here -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Product Detail Modal -->
+  <div id="product-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div class="modal-body">
+        <div class="modal-image">
+          <div id="modal-icon" class="product-icon"></div>
+        </div>
+        <div class="modal-info">
+          <h2 id="modal-title"></h2>
+          <p id="modal-category" class="modal-category"></p>
+          <p id="modal-description" class="modal-description"></p>
+          <div class="modal-features">
+            <h4>Features:</h4>
+            <ul id="modal-features-list"></ul>
+          </div>
+          <p class="modal-price">Price: <strong id="modal-price"></strong></p>
+          <div class="modal-actions">
+            <input type="number" id="modal-quantity" min="1" max="100" value="1" placeholder="Quantity">
+            <button onclick="addToCart()" class="btn-add-to-cart">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Chat Button -->
+  <div id="live-chat-icon" class="live-chat-icon" onclick="openLiveChat()" title="Live Chat Support">
+    <span>💬</span>
+  </div>
+
+  <!-- Live Chat Modal -->
+  <div id="live-chat-modal" class="live-chat-modal">
+    <div class="live-chat-container">
+      <div class="live-chat-header">
+        <h3>Live Chat Support</h3>
+        <div style="display:flex; align-items:center;">
+          <button class="btn-end-chat" onclick="userEndChat()" title="End Chat" style="display:none; margin-right:8px; padding:4px 8px; font-size:0.9rem; background:#ff4d4d; color:#fff; border:none; border-radius:4px; cursor:pointer;">End Chat</button>
+          <button class="close-chat" onclick="closeLiveChat()">&times;</button>
+        </div>
+      </div>
+      <div class="live-chat-messages" id="live-chat-messages"></div>
+      <div id="offer-end-controls" class="offer-end-controls" style="display:none; text-align:center; margin-bottom:10px;">
+        <button onclick="handleOfferResponse('needMore')" class="btn-offer">Need More Help</button>
+        <button onclick="handleOfferResponse('end')" class="btn-offer">End Chat</button>
+      </div>
+      <div class="live-chat-input-area">
+        <input type="email" id="user-email" placeholder="Your Email" required>
+        <div id="user-email-display" class="user-email-display" style="display:none; padding:6px 8px; color:#ccc;">Signed in as: <span id="user-email-text"></span></div>
+        <textarea id="chat-message" placeholder="Type your message..." rows="2"></textarea>
+        <button onclick="sendChatMessage()" class="btn-send-chat">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script src="cart.js"></script>
+  <script>
+    if (typeof AOS !== 'undefined' && AOS && typeof AOS.init === 'function') {
+      AOS.init({ once: true, duration: 600 });
+    } else {
+      console.warn('AOS is not available; continuing without animations.');
+    }
+
+    const products = {
+      apps: [
+        {
+          id: 1,
+          name: 'TaskFlow Pro',
+
+          category: 'apps',
+          price: 49,
+          icon: '📱',
+          description: 'Advanced task management app for teams and individuals',
+          features: ['Real-time collaboration', 'Push notifications', 'Offline mode', 'Cloud sync']
+        },
+        {
+          id: 2,
+          name: 'CloudNote',
+          category: 'apps',
+          price: 29,
+          icon: '📝',
+          description: 'Cross-platform note-taking application',
+          features: ['Markdown support', 'Auto-save', 'Search & organize', 'Multi-device sync']
+        },
+        {
+          id: 3,
+          name: 'BudgetMate',
+          category: 'apps',
+          price: 39,
+          icon: '💰',
+          description: 'Personal finance and expense tracking app',
+          features: ['Budget planning', 'Expense tracking', 'Report generation', 'Multi-currency']
+        },
+        {
+          id: 4,
+          name: 'FitTrack',
+          category: 'apps',
+          price: 59,
+          icon: '💪',
+          description: 'Fitness and health monitoring application',
+          features: ['Workout plans', 'Calorie tracker', 'Heart rate monitor', 'Social challenges']
+        }
+      ],
+      software: [
+        {
+          id: 5,
+          name: 'CodeStudio Elite',
+          category: 'software',
+          price: 199,
+          icon: '💻',
+          description: 'Professional code editor with AI assistance',
+          features: ['AI code completion', 'Multi-language support', 'Real-time debugging', 'Git integration']
+        },
+        {
+          id: 6,
+          name: 'DesignPro Suite',
+          category: 'software',
+          price: 249,
+          icon: '🎨',
+          description: 'Comprehensive design and graphics software',
+          features: ['Vector design', 'Photo editing', 'Animation tools', 'Team collaboration']
+        },
+        {
+          id: 7,
+          name: 'DataViz Master',
+          category: 'software',
+          price: 279,
+          icon: '📊',
+          description: 'Data visualization and analytics platform',
+          features: ['Interactive dashboards', 'Real-time analytics', 'Report builder', 'Data export']
+        },
+        {
+          id: 8,
+          name: 'VideoEdit Pro',
+          category: 'software',
+          price: 299,
+          icon: '🎬',
+          description: 'Professional video editing software',
+          features: ['4K support', 'Advanced effects', 'Multi-track editing', 'Color grading']
+        }
+      ],
+      solutions: [
+        {
+          id: 9,
+          name: 'Enterprise Security Suite',
+          category: 'solutions',
+          price: 499,
+          icon: '🛡️',
+          description: 'Complete security solution for enterprises',
+          features: ['End-to-end encryption', 'Multi-factor auth', '24/7 monitoring', 'Incident response']
+        },
+        {
+          id: 10,
+          name: 'Cloud Infrastructure Pro',
+          category: 'solutions',
+          price: 599,
+          icon: '☁️',
+          description: 'Scalable cloud infrastructure management',
+          features: ['Auto-scaling', 'Load balancing', 'Disaster recovery', 'Performance monitoring']
+        },
+        {
+          id: 11,
+          name: 'Business Intelligence Hub',
+          category: 'solutions',
+          price: 699,
+          icon: '📈',
+          description: 'Complete BI solution for data-driven decisions',
+          features: ['Data warehousing', 'Predictive analytics', 'Custom reports', 'Stakeholder dashboards']
+        },
+        {
+          id: 12,
+          name: 'Workflow Automation Engine',
+          category: 'solutions',
+          price: 549,
+          icon: '🤖',
+          description: 'Automate business processes and workflows',
+          features: ['Drag-and-drop builder', 'API integration', 'Scheduled tasks', 'Error handling']
+        }
+      ]
+    };
+
+    let currentProduct = null;
+    let cart = [];
+    let currentFilter = 'all';
+    let userEmail = null;
+
+    // Initialize
+    window.addEventListener('load', function() {
+      const userName = sessionStorage.getItem('userName') || 'Guest User';
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+      userEmail = sessionStorage.getItem('userEmail') || 'guest@example.com';
+      
+      // Clear guest cart if not logged in
+      if (!isLoggedIn) {
+        sessionStorage.removeItem('cart-guest@example.com');
+        cart = [];
+      } else {
+        loadCart();
+      }
+      
+      // Only show profile if logged in
+      if (isLoggedIn) {
+        document.getElementById('user-name').textContent = userName;
+        document.getElementById('user-email').textContent = userEmail;
+      } else {
+        // Hide profile if not logged in
+        document.querySelector('.user-profile-small').style.display = 'none';
+      }
+      
+      updateCartBadge();
+      // debug info to help track why products may not render
+      try {
+        console.log('products object exists?', typeof products !== 'undefined');
+        if (typeof products === 'undefined' || !products) {
+          const grid = document.getElementById('products-grid');
+          grid.innerHTML = '<div style="color: #fff; text-align:center; padding:40px;">No products data available.</div>';
+        } else {
+          console.log('products counts:', products.apps.length, products.software.length, products.solutions.length);
+          displayProducts('all');
+        }
+      } catch (err) {
+        console.error('displayProducts error:', err);
+        const grid = document.getElementById('products-grid');
+        if (grid) {
+          grid.innerHTML = '<div style="color: #fff; text-align:center; padding:40px;">Unable to load products due to a script error. Check console for details.</div>';
+        }
+      }
+      // retry once after short delay in case assets are still loading
+      setTimeout(() => {
+        try {
+          const grid = document.getElementById('products-grid');
+          if (grid && grid.children.length === 0 && typeof products !== 'undefined') {
+            console.log('retrying displayProducts');
+            displayProducts('all');
+          }
+        } catch (e) { console.error('retry error', e); }
+      }, 300);
+    });
+
+    function displayProducts(category) {
+      currentFilter = category;
+      const grid = document.getElementById('products-grid');
+      
+      let productsToDisplay = [];
+      if (category === 'all') {
+        productsToDisplay = [...products.apps, ...products.software, ...products.solutions];
+      } else {
+        productsToDisplay = products[category];
+      }
+
+      grid.innerHTML = productsToDisplay.map((product, index) => `
+        <div class="product-card" data-aos="fade-up" data-aos-delay="${index * 100}">
+          <div class="product-icon">${product.icon}</div>
+          <h3>${product.name}</h3>
+          <p class="product-description">${product.description}</p>
+          <div class="product-meta">
+            <span class="product-category">${getCategoryLabel(product.category)}</span>
+            <span class="product-price">$${product.price}</span>
+          </div>
+          <button onclick="openProductModal(${product.id})" class="btn-view">View Details</button>
+        </div>
+      `).join('');
+    }
+
+    function getCategoryLabel(category) {
+      const labels = {
+        apps: '📱 App',
+        software: '💻 Software',
+        solutions: '⚙️ Solution'
+      };
+      return labels[category] || category;
+    }
+
+    function filterCategory(category, evt) {
+      // Update active button
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      if (evt && evt.target) evt.target.classList.add('active');
+      
+      displayProducts(category);
+    }
+
+    function getAllProducts() {
+      return [...products.apps, ...products.software, ...products.solutions];
+    }
+
+    function openProductModal(productId) {
+      const allProducts = getAllProducts();
+      currentProduct = allProducts.find(p => p.id === productId);
+      
+      if (!currentProduct) return;
+
+      document.getElementById('modal-title').textContent = currentProduct.name;
+      document.getElementById('modal-category').textContent = getCategoryLabel(currentProduct.category);
+      document.getElementById('modal-description').textContent = currentProduct.description;
+      document.getElementById('modal-icon').textContent = currentProduct.icon;
+      document.getElementById('modal-price').textContent = `$${currentProduct.price}`;
+      
+      const featuresList = document.getElementById('modal-features-list');
+      featuresList.innerHTML = currentProduct.features.map(feature => 
+        `<li>${feature}</li>`
+      ).join('');
+      
+      document.getElementById('modal-quantity').value = 1;
+      document.getElementById('product-modal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('product-modal').style.display = 'none';
+    }
+
+    async function addToCart() {
+      if (!currentProduct) return;
+
+      const quantity = parseInt(document.getElementById('modal-quantity').value);
+      const result = await addToCartAPI(
+        String(currentProduct.id),
+        currentProduct.name,
+        currentProduct.price,
+        quantity,
+        currentProduct.icon || ''
+      );
+
+      if (result.success) {
+        closeModal();
+        alert(`${currentProduct.name} added to cart!`);
+      } else {
+        alert(result.message || 'Failed to add to cart');
+      }
+    }
+
+    async function updateCartBadge() {
+      await syncCartBadge();
+    }
+
+    async function loadCart() {
+      cart = await fetchCart();
+    }
+
+    function saveCart() {
+      // Cart is saved automatically via API calls
+    }
+
+    // Live Chat Functions
+    // update chat instantly if storage changes (admin reply/offer)
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'liveChats') {
+        loadChatMessages();
+      }
+    });
+    let chatPollInterval = null;
+    function openLiveChat() {
+      const storedEmail = sessionStorage.getItem('userEmail');
+      const emailInput = document.getElementById('user-email');
+      const emailDisplay = document.getElementById('user-email-display');
+      const emailText = document.getElementById('user-email-text');
+
+      if (storedEmail) {
+        emailInput.style.display = 'none';
+        emailDisplay.style.display = 'block';
+        emailText.textContent = storedEmail;
+      } else {
+        emailInput.style.display = 'block';
+        emailDisplay.style.display = 'none';
+      }
+
+      document.getElementById('live-chat-modal').style.display = 'flex';
+      // Load chat history when opening
+      setTimeout(() => {
+        loadChatMessages();
+      }, 100);
+
+      // start polling for changes so offer controls/exec assignment update live
+      if (!chatPollInterval) {
+        chatPollInterval = setInterval(loadChatMessages, 3000);
+      }
+    }
+
+    function closeLiveChat() {
+      document.getElementById('live-chat-modal').style.display = 'none';
+      if (chatPollInterval) {
+        clearInterval(chatPollInterval);
+        chatPollInterval = null;
+      }
+    }
+
+    function assignExecutive(email) {
+      const execs = JSON.parse(localStorage.getItem('executives') || '{}');
+      const execArray = Object.values(execs).slice();
+      execArray.sort((a, b) => {
+        const da = Date.parse(a.hireDate);
+        const db = Date.parse(b.hireDate);
+        return (isNaN(da) || isNaN(db)) ? 0 : da - db;
+      });
+      if (execArray.length === 0) {
+        addChatAlert('No executives configured yet. Please add executives in the admin panel.');
+        return null;
+      }
+      for (const exec of execArray) {
+        if (exec.id && exec.id.toLowerCase() === 'admin') continue;
+        if (!exec.busy) {
+          execs[exec.id].busy = true;
+          localStorage.setItem('executives', JSON.stringify(execs));
+          return exec.id;
+        }
+      }
+      return null;
+    }
+
+    function freeExecutive(email) {
+      const allChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const chat = allChats.find(c => c.email === email && c.assignedExec);
+      let freedExecId = null;
+      if (chat) {
+        const execId = chat.assignedExec;
+        freedExecId = execId;
+        const execs = JSON.parse(localStorage.getItem('executives') || '{}');
+        if (execs[execId]) {
+          execs[execId].busy = false;
+          localStorage.setItem('executives', JSON.stringify(execs));
+        }
+      }
+      if (freedExecId) {
+        const execs = JSON.parse(localStorage.getItem('executives') || '{}');
+        if (execs[freedExecId] && !execs[freedExecId].busy) {
+          const pendingEmail = [...new Set(allChats
+            .filter(c => !c.assignedExec && c.status !== 'closed')
+            .map(c => c.email))][0];
+          if (pendingEmail) {
+            const userMsgs = allChats.filter(c => c.email === pendingEmail && c.sender === 'user');
+            const lastUser = userMsgs.length ? userMsgs[userMsgs.length-1].message : '';
+            allChats.push({
+              id: 'CHAT-' + Date.now(),
+              email: pendingEmail,
+              message: 'AIBOT NOTE: user concern - ' + lastUser,
+              sender: 'bot',
+              date: new Date().toLocaleDateString(),
+              time: new Date().toLocaleTimeString(),
+              status: 'info'
+            });
+            allChats.forEach(c => {
+              if (c.email === pendingEmail) c.assignedExec = freedExecId;
+            });
+            execs[freedExecId].busy = true;
+            localStorage.setItem('liveChats', JSON.stringify(allChats));
+            localStorage.setItem('executives', JSON.stringify(execs));
+            addChatAlert('Executive ' + freedExecId + ' has been assigned chat from AI: ' + pendingEmail);
+          }
+        }
+      }
+    }
+
+    // Load chat history when user focuses on email field (or when email changes)
+    document.addEventListener('DOMContentLoaded', function() {
+      const emailInput = document.getElementById('user-email');
+      if (emailInput) {
+        emailInput.addEventListener('blur', loadChatMessages);
+        emailInput.addEventListener('change', loadChatMessages);
+      }
+    });
+
+    function sendChatMessage() {
+        // ensure email is remembered for future sessions
+        const stored = sessionStorage.getItem('userEmail');
+        let email = (stored && stored.trim()) || document.getElementById('user-email').value.trim();
+        if (email) {
+          sessionStorage.setItem('userEmail', email);
+        }
+        const message = document.getElementById('chat-message').value.trim();
+
+
+        if (!email || !message) {
+          alert('Please enter both email and message');
+          return;
+        }
+
+      const liveChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      let assigned = null;
+      const existing = liveChats.find(c => c.email === email && c.assignedExec && c.status !== 'closed');
+      if (existing) {
+        assigned = existing.assignedExec;
+      } else {
+        assigned = assignExecutive(email);
+      }
+
+      if (!assigned) {
+        // no executive available, route to AI bot
+        // bot will respond automatically
+        const botResponse = {
+          id: 'CHAT-' + Date.now(),
+          email: email,
+          message: 'AI Assistant: I am here to help while executives are busy. Please describe your concern.',
+          sender: 'bot',
+          date: new Date().toLocaleDateString(),
+          time: new Date().toLocaleTimeString(),
+          status: 'pending'
+        };
+        liveChats.push(botResponse);
+        alert('All executives are busy. Our AI assistant has joined the chat and will inform an executive when one becomes free.');
+      }
+
+      const chatMessage = {
+        id: 'CHAT-' + Date.now(),
+        email: email,
+        message: message,
+        sender: 'user',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        status: 'pending',
+        assignedExec: assigned
+      };
+
+      liveChats.push(chatMessage);
+      localStorage.setItem('liveChats', JSON.stringify(liveChats));
+
+      document.getElementById('chat-message').value = '';
+      loadChatMessages();
+      
+      if (!assigned) {
+        addChatAlert('High traffic: no executives available. Please hire more or have admin handle chats. New chat from ' + email + ' queued.');
+      }
+
+      // If total pending sessions exceed capacity + 2, alert admin (additional warning)
+      const execs = JSON.parse(localStorage.getItem('executives') || '{}');
+      const freeCount = Object.values(execs).filter(e => !e.busy).length;
+      const pendingSessions = Object.values(liveChats.reduce((map, c) => {
+        if (c.status !== 'closed') map[c.email] = c; return map;
+      }, {})).length;
+      if (pendingSessions > freeCount + 2) {
+        addChatAlert('High traffic: ' + pendingSessions + ' active sessions with only ' + freeCount + ' free executives.');
+      }
+
+      alert('Your message has been sent! ' + (assigned ? 'You are now connected to executive ' + assigned : 'All executives are busy currently; admin will handle soon.') );
+      }
+
+    function addChatAlert(alertMsg) {
+      const alerts = JSON.parse(localStorage.getItem('chatAlerts') || '[]');
+      alerts.push({ message: alertMsg, time: new Date().toLocaleTimeString() });
+      localStorage.setItem('chatAlerts', JSON.stringify(alerts));
+    }
+
+    function loadChatMessages() {
+      const liveChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const chatContainer = document.getElementById('live-chat-messages');
+      const offerControls = document.getElementById('offer-end-controls');
+      const stored = sessionStorage.getItem('userEmail');
+      const userEmail = (stored && stored.trim()) || document.getElementById('user-email').value.trim();
+
+      if (!userEmail) {
+        chatContainer.innerHTML = '<div class="no-chats-message">Enter your email to view chat history</div>';
+        if (offerControls) offerControls.style.display = 'none';
+        return;
+      }
+
+      const userChats = liveChats.filter(chat => chat.email === userEmail);
+
+      // free an executive when chat closed
+      const closed = userChats.find(c => c.status === 'closed' && c.assignedExec);
+      if (closed) freeExecutive(userEmail);
+
+      chatContainer.innerHTML = '';
+      const assigned = userChats.find(c => c.assignedExec)?.assignedExec;
+      if (assigned) {
+        const banner = document.createElement('div');
+        banner.className = 'assigned-banner';
+        banner.textContent = 'You are chatting with executive ' + assigned;
+        chatContainer.appendChild(banner);
+      }
+
+      if (userChats.length === 0) {
+        chatContainer.innerHTML = '<div class="no-chats-message">No previous chats. Start a new conversation!</div>';
+        if (offerControls) offerControls.style.display = 'none';
+        return;
+      }
+
+      let lastOffer = null;
+      let offerIdx = -1;
+      userChats.forEach((chat, idx) => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${chat.sender}`;
+        messageDiv.innerHTML = `
+          <p>${chat.message}</p>
+          <small>${chat.date} ${chat.time}</small>
+        `;
+        chatContainer.appendChild(messageDiv);
+        // capture offer only if sent by support (admin/executive)
+        if (chat.offerEnd && chat.sender !== 'user') {
+          lastOffer = chat;
+          offerIdx = idx;
+        }
+      });
+
+      if (lastOffer) {
+        // only consider responses that came after the last offer
+        const responded = userChats.slice(offerIdx + 1).some(c => c.offerEndResponse);
+        if (!responded && offerControls) {
+          offerControls.style.display = 'flex';
+        } else if (offerControls) {
+          offerControls.style.display = 'none';
+        }
+      } else if (offerControls) {
+        offerControls.style.display = 'none';
+      }
+
+      // Scroll to bottom
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      // end-chat button visibility/disabled
+      const endBtn = document.querySelector('.btn-end-chat');
+      if (endBtn) {
+        if (lastOffer && lastOffer.sender !== 'user') {
+          endBtn.style.display = 'inline-block';
+          const lastMsg = userChats[userChats.length - 1];
+          endBtn.disabled = lastMsg && lastMsg.status === 'closed';
+          endBtn.style.opacity = endBtn.disabled ? '0.5' : '1';
+        } else {
+          endBtn.style.display = 'none';
+        }
+      }
+    }
+
+    function handleOfferResponse(choice) {
+      const stored = sessionStorage.getItem('userEmail');
+      const email = (stored && stored.trim()) || document.getElementById('user-email').value.trim();
+      if (!email) return;
+      const liveChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const responseMsg = {
+        id: 'CHAT-' + Date.now(),
+        email: email,
+        message: choice === 'end' ? 'Thank you for choosing our support.' : 'I need more help.',
+        sender: 'user',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        offerEndResponse: choice
+      };
+      if (choice === 'end') {
+        responseMsg.status = 'closed';
+      }
+      liveChats.push(responseMsg);
+      localStorage.setItem('liveChats', JSON.stringify(liveChats));
+      if (choice === 'end') freeExecutive(email);
+      loadChatMessages();
+    }
+
+    // allow user to terminate the session manually
+    function userEndChat() {
+      const stored = sessionStorage.getItem('userEmail');
+      const email = (stored && stored.trim()) || document.getElementById('user-email').value.trim();
+      if (!email) return;
+      if (!confirm('Are you sure you want to end the chat?')) return;
+      const liveChats = JSON.parse(localStorage.getItem('liveChats') || '[]');
+      const endMsg = {
+        id: 'CHAT-' + Date.now(),
+        email: email,
+        message: 'Chat ended by user.',
+        sender: 'user',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+        offerEndResponse: 'end',
+        status: 'closed'
+      };
+      liveChats.push(endMsg);
+      localStorage.setItem('liveChats', JSON.stringify(liveChats));
+      freeExecutive(email);
+      loadChatMessages();
+      closeLiveChat();
+    }
+
+    function goToDashboard() {
+      window.location.href = 'dashboard.html#cart';
+    }
+
+    function goHome(event) {
+      event.preventDefault();
+      // Check if user is logged in
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+      if (isLoggedIn) {
+        // Keep logged-in user on dashboard
+        window.location.href = 'dashboard.html';
+      } else {
+        // Non-logged in user goes to homepage
+        window.location.href = 'index.html';
+      }
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('product-modal');
+      if (event.target == modal) {
+        closeModal();
+      }
+    }
+  </script>
+</body>
+</html>
+
+

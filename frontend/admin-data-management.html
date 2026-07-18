@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Data Management | Axora Soft</title>
+  <link rel="stylesheet" href="login.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body>
+  <div class="login-container">
+    <div class="login-card" data-aos="zoom-in">
+      <h2>Admin Data Management 🔧</h2>
+      <p>System administrator controls</p>
+      
+      <div class="admin-controls">
+        <button onclick="viewUserAnalytics()" class="admin-btn info-btn">
+          👥 User Analytics
+        </button>
+        
+        <button onclick="viewOTPLogs()" class="admin-btn warning-btn">
+          📧 OTP Delivery Logs
+        </button>
+        
+        <button onclick="viewActiveSessions()" class="admin-btn success-btn">
+          🔐 Active Sessions
+        </button>
+        
+        <button onclick="viewLoginHistory()" class="admin-btn info-btn">
+          📝 Login History
+        </button>
+        
+        <button onclick="viewVerificationMetrics()" class="admin-btn success-btn">
+          ✅ Verification Metrics
+        </button>
+        
+        <button onclick="viewSystemHealth()" class="admin-btn warning-btn">
+          🏥 System Health
+        </button>
+        
+        <button onclick="manageUserBlocking()" class="admin-btn danger-btn">
+          🚫 User Blocking
+        </button>
+        
+        <button onclick="clearAllUserData()" class="admin-btn danger-btn">
+          🗑️ Clear All User Data
+        </button>
+        
+        <button onclick="exportUserData()" class="admin-btn success-btn">
+          💾 Export User Data
+        </button>
+      </div>
+      
+      <div id="system-stats" style="display:none; margin-top:20px; padding:15px; background:#f8f9fa; border-radius:8px;">
+        <h3>System Statistics</h3>
+        <div id="stats-content"></div>
+      </div>
+      
+      <div class="admin-footer">
+        <p style="margin-top:20px; color:#666; font-size:12px;">
+          ⚠️ Admin access only. These actions affect all users.
+        </p>
+        <a href="index.html" class="back-home">← Back to Home</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function clearAllUserData() {
+      if (confirm('⚠️ WARNING: This will delete ALL user data from the server.\n\nThis action cannot be undone and will affect all registered users.\n\nAre you absolutely sure you want to continue?')) {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/admin/clear-all-users', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            alert('✅ All user data has been cleared successfully!');
+            console.log('All user data cleared from server');
+          } else {
+            alert('❌ Failed to clear user data: ' + data.message);
+          }
+        } catch (error) {
+          console.error('Error clearing user data:', error);
+          alert('❌ Failed to clear user data. Please check your connection.');
+        }
+      }
+    }
+
+    async function clearAllOTPData() {
+      if (confirm('⚠️ WARNING: This will delete all pending OTP data from the server.\n\nThis will invalidate all current OTP verification attempts.\n\nAre you sure you want to continue?')) {
+        try {
+          const response = await fetch('http://127.0.0.1:3000/admin/clear-all-otp', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            alert('✅ All OTP data has been cleared successfully!');
+            console.log('All OTP data cleared from server');
+          } else {
+            alert('❌ Failed to clear OTP data: ' + data.message);
+          }
+        } catch (error) {
+          console.error('Error clearing OTP data:', error);
+          alert('❌ Failed to clear OTP data. Please check your connection.');
+        }
+      }
+    }
+
+    async function viewSystemStats() {
+      try {
+        const response = await fetch('http://127.0.0.1:3000/admin/system-stats', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          const statsDiv = document.getElementById('system-stats');
+          const statsContent = document.getElementById('stats-content');
+          
+          statsContent.innerHTML = `
+            <p><strong>Total Users:</strong> ${data.totalUsers}</p>
+            <p><strong>Verified Users:</strong> ${data.verifiedUsers}</p>
+            <p><strong>Pending OTPs:</strong> ${data.pendingOtps}</p>
+            <p><strong>Server Uptime:</strong> ${data.uptime}</p>
+            <p><strong>Database Status:</strong> ${data.dbStatus}</p>
+          `;
+          
+          statsDiv.style.display = 'block';
+        } else {
+          alert('❌ Failed to fetch system statistics: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching system stats:', error);
+        alert('❌ Failed to fetch system statistics. Please check your connection.');
+      }
+    }
+
+    async function viewUserAnalytics() {
+      try {
+        const response = await fetch('http://127.0.0.1:3000/admin/user-analytics', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          displayAdminData('User Analytics', `
+            <p><strong>Total Users:</strong> ${data.totalUsers}</p>
+            <p><strong>Verified Users:</strong> ${data.verifiedUsers}</p>
+            <p><strong>Unverified Users:</strong> ${data.unverifiedUsers}</p>
+            <p><strong>Blocked Users:</strong> ${data.blockedUsers}</p>
+            <p><strong>New Users (Today):</strong> ${data.newUsersToday}</p>
+            <p><strong>Active Users (Last 7 days):</strong> ${data.activeUsers}</p>
+            <p><strong>Average Login Count:</strong> ${data.avgLoginCount}</p>
+          `);
+        } else {
+          alert('❌ Failed to fetch user analytics: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching user analytics:', error);
+        alert('❌ Failed to fetch user analytics. Please check your connection.');
+      }
+    }
+
+    async function viewOTPLogs() {
+      try {
+        const response = await fetch('http://127.0.0.1:3000/admin/otp-logs', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          let logsHtml = '<div style="max-height: 300px; overflow-y: auto;">';
+          data.logs.forEach(log => {
+            logsHtml += `
+              <div style="border-bottom: 1px solid #eee; padding: 8px 0;">
+                <p><strong>Email:</strong> ${log.email}</p>
+                <p><strong>Status:</strong> ${log.status}</p>
+                <p><strong>Time:</strong> ${new Date(log.timestamp).toLocaleString()}</p>
+                <p><strong>IP:</strong> ${log.ip || 'N/A'}</p>
+              </div>
+            `;
+          });
+          logsHtml += '</div>';
+          
+          displayAdminData('OTP Delivery Logs', logsHtml);
+        } else {
+          alert('❌ Failed to fetch OTP logs: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching OTP logs:', error);
+        alert('❌ Failed to fetch OTP logs. Please check your connection.');
+      }
+    }
+
+    async function viewActiveSessions() {
+      try {
+        const response = await fetch('http://127.0.0.1:3000/admin/active-sessions', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          let sessionsHtml = '<div style="max-height: 300px; overflow-y: auto;">';
+          data.sessions.forEach(session => {
+            sessionsHtml += `
+              <div style="border-bottom: 1px solid #eee; padding: 8px 0;">
+                <p><strong>User:</strong> ${session.email}</p>
+                <p><strong>Login Time:</strong> ${new Date(session.loginTime).toLocaleString()}</p>
+                <p><strong>Last Activity:</strong> ${new Date(session.lastActivity).toLocaleString()}</p>
+                <p><strong>IP Address:</strong> ${session.ip}</p>
+                <p><strong>Device:</strong> ${session.userAgent || 'N/A'}</p>
+              </div>
+            `;
+          });
+          sessionsHtml += '</div>';
+          
+          displayAdminData('Active Sessions', sessionsHtml);
+        } else {
+          alert('❌ Failed to fetch active sessions: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching active sessions:', error);
+        alert('❌ Failed to fetch active sessions. Please check your connection.');
+      }
+    }
+
+    async function viewLoginHistory() {
+      try {
+        const response = await fetch('http://127.0.0.1:3000/admin/login-history', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          let historyHtml = '<div style="max-height: 300px; overflow-y: auto;">';
+          data.history.slice(0, 50).forEach(log => {
+            historyHtml += `
+              <div style="border-bottom: 1px solid #eee; padding: 8px 0;">
+                <p><strong>Email:</strong> ${log.email}</p>
+                <p><strong>Status:</strong> <span style="color: ${log.success ? 'green' : 'red'}">${log.success ? 'Success' : 'Failed'}</span></p>
+                <p><strong>Time:</strong> ${new Date(log.timestamp).toLocaleString()}</p>
+                <p><strong>IP:</strong> ${log.ip}</p>
+                <p><strong>Reason:</strong> ${log.reason || 'N/A'}</p>
+              </div>
+            `;
+          });
+          historyHtml += '</div>';
+          
+          displayAdminData('Login History (Last 50)', historyHtml);
+        } else {
+          alert('❌ Failed to fetch login history: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching login history:', error);
+        alert('❌ Failed to fetch login history. Please check your connection.');
+      }
+    }
+
+    async function viewVerificationMetrics() {
+      try {
+        const response = await fetch('http://127.0.0.1:3000/admin/verification-metrics', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          displayAdminData('Verification Metrics', `
+            <p><strong>Total OTP Sent:</strong> ${data.totalSent}</p>
+            <p><strong>Total Verified:</strong> ${data.totalVerified}</p>
+            <p><strong>Success Rate:</strong> ${data.successRate}%</p>
+            <p><strong>Failed Attempts:</strong> ${data.failedAttempts}</p>
+            <p><strong>Average Verification Time:</strong> ${data.avgVerificationTime}s</p>
+            <p><strong>Expired OTPs:</strong> ${data.expiredOtps}</p>
+            <p><strong>Verification Rate (Today):</strong> ${data.todayRate}%</p>
+          `);
+        } else {
+          alert('❌ Failed to fetch verification metrics: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching verification metrics:', error);
+        alert('❌ Failed to fetch verification metrics. Please check your connection.');
+      }
+    }
+
+    async function viewSystemHealth() {
+      try {
+        const response = await fetch('http://127.0.0.1:3000/admin/system-health', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          displayAdminData('System Health', `
+            <p><strong>Server Status:</strong> <span style="color: green">🟢 Online</span></p>
+            <p><strong>Database Status:</strong> <span style="color: green">🟢 Connected</span></p>
+            <p><strong>Gmail SMTP:</strong> <span style="color: green">🟢 Active</span></p>
+            <p><strong>Memory Usage:</strong> ${data.memoryUsage}%</p>
+            <p><strong>CPU Usage:</strong> ${data.cpuUsage}%</p>
+            <p><strong>Uptime:</strong> ${data.uptime}</p>
+            <p><strong>Active Connections:</strong> ${data.activeConnections}</p>
+            <p><strong>Response Time:</strong> ${data.responseTime}ms</p>
+            <p><strong>Error Rate:</strong> ${data.errorRate}%</p>
+          `);
+        } else {
+          alert('❌ Failed to fetch system health: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching system health:', error);
+        alert('❌ Failed to fetch system health. Please check your connection.');
+      }
+    }
+
+    async function manageUserBlocking() {
+      const email = prompt('Enter user email to block/unblock:');
+      if (!email) return;
+      
+      const action = confirm('Block this user? (OK = Block, Cancel = Unblock)');
+      
+      try {
+        const response = await fetch('http://127.0.0.1:3000/admin/manage-user-blocking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, block: action })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert(`✅ User ${action ? 'blocked' : 'unblocked'} successfully!`);
+        } else {
+          alert('❌ Failed to manage user blocking: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error managing user blocking:', error);
+        alert('❌ Failed to manage user blocking. Please check your connection.');
+      }
+    }
+
+    async function exportUserData() {
+      try {
+        const response = await fetch('http://127.0.0.1:3000/admin/export-users', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          // Create and download CSV file
+          const csvContent = data.csvData;
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `user_data_${new Date().toISOString().split('T')[0]}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          
+          alert('✅ User data exported successfully!');
+        } else {
+          alert('❌ Failed to export user data: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error exporting user data:', error);
+        alert('❌ Failed to export user data. Please check your connection.');
+      }
+    }
+
+    function displayAdminData(title, content) {
+      const statsDiv = document.getElementById('system-stats');
+      const statsContent = document.getElementById('stats-content');
+      
+      statsDiv.querySelector('h3').textContent = title;
+      statsContent.innerHTML = content;
+      statsDiv.style.display = 'block';
+    }
+  </script>
+
+  <style>
+    .admin-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .admin-btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    
+    .danger-btn {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .danger-btn:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+    }
+    
+    .warning-btn {
+      background: #ffc107;
+      color: #212529;
+    }
+    
+    .warning-btn:hover {
+      background: #e0a800;
+      transform: translateY(-2px);
+    }
+    
+    .info-btn {
+      background: #17a2b8;
+      color: white;
+    }
+    
+    .info-btn:hover {
+      background: #138496;
+      transform: translateY(-2px);
+    }
+    
+    .success-btn {
+      background: #28a745;
+      color: white;
+    }
+    
+    .success-btn:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+    
+    .admin-footer {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+  </style>
+</body>
+</html>

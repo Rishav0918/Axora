@@ -1,0 +1,160 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #000, #1a0033, #000);
+  background-size: 300% 300%;
+  animation: bg 8s ease infinite;
+  font-family: system-ui, sans-serif;
+  padding: 20px;
+}
+
+@keyframes bg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.login-card {
+  width: 380px;
+  padding: 35px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(15px);
+  border-radius: 18px;
+  text-align: center;
+  color: #fff;
+}
+
+.login-card h2 {
+  margin-bottom: 10px;
+}
+
+.login-card p {
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+}
+
+@media (max-width: 480px) {
+  .login-card input {
+    font-size: 16px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-card input {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
+
+.login-card button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #00c6ff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+@media (max-width: 480px) {
+  .login-card button {
+    font-size: 16px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-card button {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
+
+.back-home {
+  display: inline-block;
+  margin-top: 20px;
+  color: #00c6ff;
+  text-decoration: none;
+}
+
+.login-links {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.login-links p {
+  margin: 5px 0;
+}
+
+.form-container {
+  margin-bottom: 20px;
+}
+
+.toggle-text {
+  margin-top: 15px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.toggle-text a {
+  color: #00c6ff;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.toggle-text a:hover {
+  text-decoration: underline;
+}
+
+.secondary-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #666;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.secondary-btn:hover {
+  background: #555;
+}
+
+.clear-data-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #dc3545;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.clear-data-btn:hover {
+  background: #c82333;
+}

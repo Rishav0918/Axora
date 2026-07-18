@@ -1,0 +1,285 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Checkout | Rishav Software</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="logo-section">
+        <h1 class="logo">RR</h1>
+      </div>
+      <div class="user-info">
+        <button onclick="goHome()" class="btn-home">🏠 Home</button>
+        <div class="user-profile">
+          <div class="user-avatar">👤</div>
+          <div class="user-details">
+            <span class="user-name" id="user-name-display">User Name</span>
+            <span class="user-email" id="user-email-display">user@example.com</span>
+          </div>
+        </div>
+        <button onclick="handleLogout()" class="btn-logout">Logout</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <section class="content-section active">
+        <h2>Checkout</h2>
+        <div class="checkout-container">
+          <div class="checkout-content">
+            <!-- Order Summary Left Side -->
+            <div class="checkout-summary">
+              <h3>Order Summary</h3>
+              <div id="checkout-items">
+                <!-- Items will be loaded here -->
+              </div>
+              <div class="checkout-totals">
+                <p>Subtotal: <span id="checkout-subtotal">$0</span></p>
+                <p>Tax (10%): <span id="checkout-tax">$0</span></p>
+                <p class="total"><strong>Total: <span id="checkout-total">$0</span></strong></p>
+              </div>
+            </div>
+
+            <!-- Shipping Address Right Side -->
+            <div class="checkout-address">
+              <h3>Shipping Address</h3>
+              <form id="address-form" onsubmit="processCheckout(event)">
+                <div class="form-group">
+                  <label for="fullname">Full Name *</label>
+                  <input type="text" id="fullname" name="fullname" required placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                  <label for="email">Email Address *</label>
+                  <input type="email" id="email" name="email" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                  <label for="phone">Phone Number *</label>
+                  <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number">
+                </div>
+
+                <div class="form-group">
+                  <label for="street">Street Address *</label>
+                  <input type="text" id="street" name="street" required placeholder="Enter your street address">
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="city">City *</label>
+                    <input type="text" id="city" name="city" required placeholder="Enter your city">
+                  </div>
+                  <div class="form-group">
+                    <label for="state">State/Province *</label>
+                    <input type="text" id="state" name="state" required placeholder="Enter state/province">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="zipcode">Zip/Postal Code *</label>
+                    <input type="text" id="zipcode" name="zipcode" required placeholder="Enter zip code">
+                  </div>
+                  <div class="form-group">
+                    <label for="country">Country *</label>
+                    <input type="text" id="country" name="country" required placeholder="Enter country">
+                  </div>
+                </div>
+
+                <div class="form-group checkbox">
+                  <label>
+                    <input type="checkbox" id="same-as-billing" checked>
+                    Same as billing address
+                  </label>
+                </div>
+
+                <div class="form-group">
+                  <label for="customization">Customization Requirements (Optional)</label>
+                  <textarea id="customization" name="customization" rows="3" placeholder="Describe any specific customization needs for your software (e.g., features, integrations, branding)"></textarea>
+                </div>
+
+                <button type="submit" class="btn-process">Process Order</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script src="cart.js"></script>
+  <script>
+    AOS.init({ once: true });
+
+    let cart = [];
+    let userEmail = '';
+
+    window.addEventListener('load', async function() {
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+      if (!isLoggedIn) {
+        alert('Please login to proceed to checkout.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      userEmail = sessionStorage.getItem('userEmail');
+      const userName = sessionStorage.getItem('userName') || 'User';
+      document.getElementById('user-name-display').textContent = userName;
+      document.getElementById('user-email-display').textContent = userEmail;
+
+      await loadCart();
+      displayCheckoutItems();
+    });
+
+    async function loadCart() {
+      cart = await fetchCart();
+    }
+
+    function displayCheckoutItems() {
+      const container = document.getElementById('checkout-items');
+      let subtotal = 0;
+
+      if (cart.length === 0) {
+        container.innerHTML = '<p style="color: #00c6ff; font-style: italic;">Your cart is empty. Add items from the products page.</p>';
+        document.getElementById('checkout-subtotal').textContent = '$0.00';
+        document.getElementById('checkout-tax').textContent = '$0.00';
+        document.getElementById('checkout-total').textContent = '$0.00';
+        return;
+      }
+
+      container.innerHTML = cart.map(item => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+        return `
+          <div class="checkout-item">
+            <span>${item.name} (x${item.quantity})</span>
+            <span>$${itemTotal.toFixed(2)}</span>
+          </div>
+        `;
+      }).join('');
+
+      const tax = subtotal * 0.1;
+      const total = subtotal + tax;
+
+      document.getElementById('checkout-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+      document.getElementById('checkout-tax').textContent = `$${tax.toFixed(2)}`;
+      document.getElementById('checkout-total').textContent = `$${total.toFixed(2)}`;
+    }
+
+    function processPayment(event) {
+      event.preventDefault();
+
+      // Simulate payment processing
+      alert('Processing payment...');
+
+      setTimeout(() => {
+        completeOrder();
+      }, 2000);
+    }
+
+    function processCheckout(event) {
+      event.preventDefault();
+
+      // Collect address data
+      const fullname = document.getElementById('fullname').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const street = document.getElementById('street').value;
+      const city = document.getElementById('city').value;
+      const state = document.getElementById('state').value;
+      const zipcode = document.getElementById('zipcode').value;
+      const country = document.getElementById('country').value;
+      const customization = document.getElementById('customization').value;
+
+      // Validate address
+      if (!fullname || !email || !phone || !street || !city || !state || !zipcode || !country) {
+        alert('Please fill in all address fields');
+        return;
+      }
+
+      // Store address and customization in sessionStorage for payment page
+      const shippingAddress = {
+        fullname: fullname,
+        email: email,
+        phone: phone,
+        street: street,
+        city: city,
+        state: state,
+        zipcode: zipcode,
+        country: country
+      };
+
+      sessionStorage.setItem('shippingAddress', JSON.stringify(shippingAddress));
+      sessionStorage.setItem('customization', customization);
+
+      // Redirect to payment page and open Razorpay automatically
+      window.location.href = 'payment.html?auto=1';
+    }
+
+    function completeOrder() {
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const tax = subtotal * 0.1;
+      const finalTotal = subtotal + tax;
+
+      const order = {
+        id: 'ORD-' + Date.now(),
+        date: new Date().toLocaleDateString(),
+        products: cart.map(item => `${item.name} (x${item.quantity})`).join(', '),
+        amount: finalTotal,
+        status: 'Completed',
+        quantity: cart.reduce((sum, item) => sum + item.quantity, 0)
+      };
+
+      // Save order to user orders
+      const ordersKey = `orders-${userEmail}`;
+      const existingOrders = JSON.parse(localStorage.getItem(ordersKey) || '[]');
+      existingOrders.unshift(order);
+      localStorage.setItem(ordersKey, JSON.stringify(existingOrders));
+
+      // Save to admin system
+      const userName = sessionStorage.getItem('userName') || 'Guest User';
+      const allUsers = JSON.parse(localStorage.getItem('all-users') || '{}');
+      if (!allUsers[userEmail]) {
+        allUsers[userEmail] = {
+          name: userName,
+          email: userEmail,
+          registrationDate: new Date().toLocaleDateString(),
+          orders: []
+        };
+      }
+      allUsers[userEmail].orders = allUsers[userEmail].orders || [];
+      allUsers[userEmail].orders.push(order);
+      localStorage.setItem('all-users', JSON.stringify(allUsers));
+
+      // Clear cart
+      cart = [];
+      const cartKey = `cart-${userEmail}`;
+      localStorage.removeItem(cartKey);
+
+      alert(`Payment successful! Order ID: ${order.id}\nTotal: $${finalTotal.toFixed(2)}\nThank you for your purchase!`);
+      window.location.href = 'dashboard.html';
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('isLoggedIn');
+      sessionStorage.removeItem('userName');
+      sessionStorage.removeItem('userEmail');
+      alert('Logged out successfully!');
+      window.location.href = 'index.html';
+    }
+
+    function goHome() {
+      window.location.href = 'dashboard.html';
+    }
+  </script>
+</body>
+</html>
+

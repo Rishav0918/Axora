@@ -1,0 +1,285 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Payment | Rishav Software</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="logo-section">
+        <h1 class="logo">RR</h1>
+      </div>
+      <div class="user-info">
+        <button onclick="goHome()" class="btn-home">🏠 Home</button>
+        <div class="user-profile">
+          <div class="user-avatar">👤</div>
+          <div class="user-details">
+            <span class="user-name" id="user-name-display">User Name</span>
+            <span class="user-email" id="user-email-display">user@example.com</span>
+          </div>
+        </div>
+        <button onclick="handleLogout()" class="btn-logout">Logout</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <section class="content-section active">
+        <h2>Payment</h2>
+        <div class="payment-container">
+          <!-- Shipping Address Summary -->
+          <div class="address-summary">
+            <h3>📦 Shipping Address</h3>
+            <div id="address-display">
+              <!-- Address will be loaded here -->
+            </div>
+          </div>
+
+          <!-- Payment Form -->
+          <div class="payment-form">
+            <h3>💳 Payment Information</h3>
+            <p class="payment-description">Proceed with secure Razorpay checkout. Your shipping details are already loaded above.</p>
+            <div class="payment-details">
+              <div class="payment-info">
+                <p>Razorpay will open automatically. If it does not appear, click the button below.</p>
+                <button onclick="processPayment(event)" class="btn-payment">Open Razorpay</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Success Modal -->
+  <div id="success-modal" class="modal" style="display:none;">
+    <div class="modal-content success-content">
+      <div class="success-icon">✔️</div>
+      <h2>Order Successfully Placed!</h2>
+      <div class="success-details">
+        <p><strong>Order ID:</strong> <span id="order-id-display"></span></p>
+        <p><strong>Total Amount:</strong> <span id="order-amount-display"></span></p>
+        <p><strong>Date:</strong> <span id="order-date-display"></span></p>
+        <p class="success-message">Thank you for your purchase! Your order has been confirmed and will be processed shortly.</p>
+      </div>
+      <button onclick="goToDashboard()" class="btn-success">Go to Dashboard</button>
+      <button onclick="goHome()" class="btn-success-secondary">Return Home</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script src="cart.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    AOS.init({ once: true });
+
+    let cart = [];
+    let userEmail = '';
+
+    window.addEventListener('load', async function() {
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+      if (!isLoggedIn) {
+        alert('Please login to proceed to payment.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      userEmail = sessionStorage.getItem('userEmail');
+      const userName = sessionStorage.getItem('userName') || 'User';
+      document.getElementById('user-name-display').textContent = userName;
+      document.getElementById('user-email-display').textContent = userEmail;
+
+      await loadCart();
+      loadShippingAddress();
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('auto') === '1') {
+        setTimeout(() => {
+          processPayment({ preventDefault: () => {} });
+        }, 300);
+      }
+    });
+
+    function loadShippingAddress() {
+      const addressData = sessionStorage.getItem('shippingAddress');
+      const addressDisplay = document.getElementById('address-display');
+
+      if (addressData) {
+        const address = JSON.parse(addressData);
+        addressDisplay.innerHTML = `
+          <div class="address-details">
+            <p><strong>${address.fullname}</strong></p>
+            <p>${address.street}</p>
+            <p>${address.city}, ${address.state} ${address.zipcode}</p>
+            <p>${address.country}</p>
+            <p>📧 ${address.email}</p>
+            <p>📞 ${address.phone}</p>
+          </div>
+        `;
+      } else {
+        addressDisplay.innerHTML = `
+          <div class="address-details">
+            <p style="color: #ffa500; font-style: italic;">❌ No shipping address found. Please go back to checkout to enter your address.</p>
+          </div>
+        `;
+      }
+    }
+
+    async function loadCart() {
+      cart = await fetchCart();
+    }
+
+    async function processPayment(event) {
+      event.preventDefault();
+
+      if (!cart || cart.length === 0) {
+        alert('Your cart is empty. Add items before making a payment.');
+        return;
+      }
+
+      if (typeof Razorpay === 'undefined') {
+        alert('Razorpay checkout is not available. Please check your internet connection and try again.');
+        return;
+      }
+
+      const shippingAddress = JSON.parse(sessionStorage.getItem('shippingAddress') || '{}');
+      const customization = sessionStorage.getItem('customization') || '';
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const tax = subtotal * 0.1;
+      const finalTotal = subtotal + tax;
+      const amountInPaise = Math.round(finalTotal * 100);
+
+      try {
+        const response = await fetch('http://127.0.0.1:3000/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: amountInPaise })
+        });
+
+        const data = await response.json();
+        if (!response.ok || data.error || !data.order) {
+          throw new Error(data.error || 'Unable to create payment order.');
+        }
+
+        const rzpOptions = {
+          key: 'rzp_live_TB785BWaVdLm7l',
+          amount: amountInPaise,
+          currency: 'INR',
+          name: 'Rishav Software',
+          description: 'Order payment',
+          order_id: data.order.id,
+          handler: function(paymentResult) {
+            verifyPayment(paymentResult, data.order.id);
+          },
+          prefill: {
+            name: shippingAddress.fullname || '',
+            email: shippingAddress.email || '',
+            contact: shippingAddress.phone || ''
+          },
+          theme: { color: '#3399cc' }
+        };
+
+        const rzp = new Razorpay(rzpOptions);
+        rzp.on('payment.failed', function(failure) {
+          console.error('Payment failed', failure);
+          alert('Payment failed. Please try again.');
+        });
+        rzp.open();
+      } catch (error) {
+        console.error('Create order error:', error);
+        alert('Unable to start payment. Please try again later.');
+      }
+    }
+
+    async function verifyPayment(response, orderId) {
+      try {
+        const res = await fetch('http://127.0.0.1:3000/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            razorpay_order_id: orderId,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          completeOrder(response.razorpay_payment_id);
+        } else {
+          console.error('Verify payment failed', data);
+          alert('Payment verification failed. Please contact support.');
+        }
+      } catch (err) {
+        console.error('Verify payment error:', err);
+        alert('Unable to verify payment. Please try again.');
+      }
+    }
+
+    async function completeOrder(paymentId = '') {
+      const shippingAddress = JSON.parse(sessionStorage.getItem('shippingAddress') || '{}');
+      const customization = sessionStorage.getItem('customization') || '';
+      const token = sessionStorage.getItem('token');
+
+      try {
+        const response = await fetch('http://127.0.0.1:3000/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            customization: customization,
+            shippingAddress: shippingAddress
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          // Clear cart
+          await clearCartAPI();
+
+          // Clear sessionStorage
+          sessionStorage.removeItem('shippingAddress');
+          sessionStorage.removeItem('customization');
+
+          // Show success modal
+          document.getElementById('order-id-display').textContent = data.order.orderId;
+          document.getElementById('order-amount-display').textContent = `$${data.order.totalAmount.toFixed(2)}`;
+          document.getElementById('order-date-display').textContent = new Date(data.order.createdAt).toLocaleDateString();
+          document.getElementById('success-modal').style.display = 'flex';
+        } else {
+          alert(data.message || 'Failed to complete order');
+        }
+      } catch (error) {
+        console.error('Complete order error:', error);
+        alert('Unable to complete order. Please try again.');
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('isLoggedIn');
+      sessionStorage.removeItem('userName');
+      sessionStorage.removeItem('userEmail');
+      alert('Logged out successfully!');
+      window.location.href = 'index.html';
+    }
+
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    function goToDashboard() {
+      window.location.href = 'dashboard.html';
+    }
+  </script>
+</body>
+</html>
+

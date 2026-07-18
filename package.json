@@ -1,0 +1,29 @@
+{
+  "name": "axora-soft",
+  "version": "1.0.0",
+  "description": "Axora Soft - Digital Solutions Provider",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "cd backend && node server.js",
+    "dev": "cd backend && node server.js",
+    "install-deps": "cd backend && npm install"
+  },
+  "keywords": [
+    "web-development",
+    "game-development",
+    "mobile-apps",
+    "ui-ux-design",
+    "digital-solutions"
+  ],
+  "author": "Axora Soft",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "razorpay": "^2.9.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

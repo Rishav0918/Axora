@@ -67,10 +67,15 @@
   </div>
 
   <script>
+    // API Configuration
+    const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://127.0.0.1:3000'
+      : 'https://axora-backend-40xh.onrender.com';
+
     async function clearAllUserData() {
       if (confirm('⚠️ WARNING: This will delete ALL user data from the server.\n\nThis action cannot be undone and will affect all registered users.\n\nAre you absolutely sure you want to continue?')) {
         try {
-          const response = await fetch('http://127.0.0.1:3000/admin/clear-all-users', {
+          const response = await fetch(`${API_BASE_URL}/admin/clear-all-users`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' }
           });
@@ -93,7 +98,7 @@
     async function clearAllOTPData() {
       if (confirm('⚠️ WARNING: This will delete all pending OTP data from the server.\n\nThis will invalidate all current OTP verification attempts.\n\nAre you sure you want to continue?')) {
         try {
-          const response = await fetch('http://127.0.0.1:3000/admin/clear-all-otp', {
+          const response = await fetch(`${API_BASE_URL}/admin/clear-all-otp`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' }
           });
@@ -115,7 +120,7 @@
 
     async function viewSystemStats() {
       try {
-        const response = await fetch('http://127.0.0.1:3000/admin/system-stats', {
+        const response = await fetch(`${API_BASE_URL}/admin/system-stats`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -146,7 +151,7 @@
 
     async function viewUserAnalytics() {
       try {
-        const response = await fetch('http://127.0.0.1:3000/admin/user-analytics', {
+        const response = await fetch(`${API_BASE_URL}/admin/user-analytics`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -174,7 +179,7 @@
 
     async function viewOTPLogs() {
       try {
-        const response = await fetch('http://127.0.0.1:3000/admin/otp-logs', {
+        const response = await fetch(`${API_BASE_URL}/admin/otp-logs`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -207,7 +212,7 @@
 
     async function viewActiveSessions() {
       try {
-        const response = await fetch('http://127.0.0.1:3000/admin/active-sessions', {
+        const response = await fetch(`${API_BASE_URL}/admin/active-sessions`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -241,7 +246,7 @@
 
     async function viewLoginHistory() {
       try {
-        const response = await fetch('http://127.0.0.1:3000/admin/login-history', {
+        const response = await fetch(`${API_BASE_URL}/admin/login-history`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -275,7 +280,7 @@
 
     async function viewVerificationMetrics() {
       try {
-        const response = await fetch('http://127.0.0.1:3000/admin/verification-metrics', {
+        const response = await fetch(`${API_BASE_URL}/admin/verification-metrics`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -303,7 +308,7 @@
 
     async function viewSystemHealth() {
       try {
-        const response = await fetch('http://127.0.0.1:3000/admin/system-health', {
+        const response = await fetch(`${API_BASE_URL}/admin/system-health`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -338,7 +343,7 @@
       const action = confirm('Block this user? (OK = Block, Cancel = Unblock)');
       
       try {
-        const response = await fetch('http://127.0.0.1:3000/admin/manage-user-blocking', {
+        const response = await fetch(`${API_BASE_URL}/admin/manage-user-blocking`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, block: action })
@@ -359,7 +364,7 @@
 
     async function exportUserData() {
       try {
-        const response = await fetch('http://127.0.0.1:3000/admin/export-users', {
+        const response = await fetch(`${API_BASE_URL}/admin/export-users`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });

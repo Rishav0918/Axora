@@ -135,6 +135,11 @@
       cart = await fetchCart();
     }
 
+    // API Configuration
+    const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://127.0.0.1:3000'
+      : 'https://axora-backend-40xh.onrender.com';
+
     async function processPayment(event) {
       event.preventDefault();
 
@@ -156,7 +161,7 @@
       const amountInPaise = Math.round(finalTotal * 100);
 
       try {
-        const response = await fetch('http://127.0.0.1:3000/create-order', {
+        const response = await fetch(`${API_BASE_URL}/create-order`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount: amountInPaise })
@@ -199,7 +204,7 @@
 
     async function verifyPayment(response, orderId) {
       try {
-        const res = await fetch('http://127.0.0.1:3000/verify-payment', {
+        const res = await fetch(`${API_BASE_URL}/verify-payment`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -228,7 +233,7 @@
       const token = sessionStorage.getItem('token');
 
       try {
-        const response = await fetch('http://127.0.0.1:3000/api/orders', {
+        const response = await fetch(`${API_BASE_URL}/api/orders`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

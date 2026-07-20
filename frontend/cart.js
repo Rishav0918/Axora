@@ -1,7 +1,9 @@
 // ===== CART API UTILITY =====
 // Backend cart integration with JWT authentication
 
-const API_BASE = 'http://127.0.0.1:3000';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://127.0.0.1:3000'
+  : 'https://axora-backend-40xh.onrender.com';
 
 function getToken() {
   return sessionStorage.getItem('token');

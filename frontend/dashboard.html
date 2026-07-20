@@ -351,6 +351,11 @@
     let currentProduct = null;
     let userEmail = null;
 
+    // API Configuration
+    const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://127.0.0.1:3000'
+      : 'https://axora-backend-40xh.onrender.com';
+
     // Initialize
     window.addEventListener('load', function() {
       // dashboard should rely on sessionStorage for per-tab/multiuser support
@@ -699,7 +704,7 @@
     async function openLiveChat() {
       // Check chat status first
       try {
-        const response = await fetch('http://127.0.0.1:3000/api/chat/status');
+        const response = await fetch(`${API_BASE_URL}/api/chat/status`);
         const data = await response.json();
 
         if (data.success) {
@@ -728,7 +733,7 @@
 
     async function joinChatQueue() {
       try {
-        const response = await fetch('http://127.0.0.1:3000/api/chat/join', {
+        const response = await fetch(`${API_BASE_URL}/api/chat/join`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: userEmail })
@@ -910,7 +915,7 @@
     async function closeLiveChat() {
       // Leave chat queue
       try {
-        await fetch('http://127.0.0.1:3000/api/chat/leave', {
+        await fetch(`${API_BASE_URL}/api/chat/leave`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: userEmail })
@@ -1071,7 +1076,7 @@
     async function viewReceipt(orderId) {
       const token = sessionStorage.getItem('token');
       try {
-        const response = await fetch(`http://127.0.0.1:3000/api/orders/${orderId}/receipt`, {
+        const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/receipt`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -1096,7 +1101,7 @@
       const recommendationsContainer = document.getElementById('ai-recommendations');
 
       try {
-        const response = await fetch('http://127.0.0.1:3000/api/ai/recommendations', {
+        const response = await fetch(`${API_BASE_URL}/api/ai/recommendations`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -1264,7 +1269,7 @@
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
       
       try {
-        const response = await fetch('http://127.0.0.1:3000/api/ai/chat', {
+        const response = await fetch(`${API_BASE_URL}/api/ai/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message })

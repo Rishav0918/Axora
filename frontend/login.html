@@ -84,13 +84,18 @@
       window.location.href = 'reset-password.html';
     }
 
+    // API Configuration
+    const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://127.0.0.1:3000'
+      : 'https://axora-backend-40xh.onrender.com';
+
     async function handleLogin(event) {
       event.preventDefault();
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
       
       try {
-        const response = await fetch('http://127.0.0.1:3000/login', {
+        const response = await fetch(`${API_BASE_URL}/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -172,7 +177,7 @@
         submitButton.disabled = true;
         submitButton.textContent = 'Sending OTP...';
         
-        const response = await fetch('http://127.0.0.1:3000/send-email-otp', {
+        const response = await fetch(`${API_BASE_URL}/send-email-otp`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email })
@@ -229,7 +234,7 @@
       verifyButton.textContent = 'Verifying...';
       
       try {
-        const response = await fetch('http://127.0.0.1:3000/verify-email-otp', {
+        const response = await fetch(`${API_BASE_URL}/verify-email-otp`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: pendingSignup.email, otp })
